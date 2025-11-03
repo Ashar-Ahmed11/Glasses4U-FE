@@ -1,0 +1,115 @@
+
+  
+  /* card shell */
+  .product-card {
+    width: 320px;
+    border-radius: 20px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* top badge */
+  .badge-top {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    background: #dbeff3;
+    color: #2d5f6d;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 999px;
+    z-index: 2;
+  }
+  
+  /* heart btn */
+  .btn-like {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: #fff;
+    border-radius: 999px;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  /* image */
+  .img-wrap {
+    min-height: 180px;
+    padding: 30px 20px 15px;
+  }
+  
+  .img-wrap img {
+    max-height: 130px;
+    object-fit: contain;
+  }
+  
+  /* text styles */
+  .price {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  
+  .rating .star {
+    color: #fcbf22;
+    font-size: 1.05rem;
+  }
+  
+  .delivery {
+    color: #006e3f;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  /* swatches */
+  .swatches {
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+  
+  .swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: 2.5px solid transparent;
+    outline: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+  }
+  
+  .swatch-red {
+    background: #880000;
+  }
+  
+  .swatch-black {
+    background: #000;
+  }
+  
+  .swatch-white {
+    background: #fff;
+  }
+  
+  .swatch.selected {
+    border-color: #000;
+    outline-color: #000;
+  }
+  
+  .swatch-add {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    border: 1.6px dashed #888;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
