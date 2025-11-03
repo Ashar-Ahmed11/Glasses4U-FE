@@ -21,19 +21,19 @@ const SecHero = () => {
                 {/* person 1 */}
                 <img
                     className="person person-left"
-                    src="https://thumbs.dreamstime.com/b/middle-aged-white-man-glasses-smiling-to-camera-vertical-85215429.jpg"
+                    src="https://img.freepik.com/premium-photo/portrait-handsome-man-with-beard-wearing-glasses-black-jacket_1102944-6693.jpg"
                     alt="Model with glasses"
                 />
                 {/* person 2 */}
                 <img
                     className="person person-middle"
-                    src="https://thumbs.dreamstime.com/b/cool-handsome-guy-glasses-beard-52415143.jpg"
+                    src="https://img.freepik.com/premium-photo/minimal-vertical-portrait-handsome-africanamerican-man-wearing-glasses-looking-away-while-pos_236854-33943.jpg"
                     alt="Model with glasses"
                 />
                 {/* person 3 */}
                 <img
                     className="person person-right"
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTElnCjPYqof03ULh-3cKuWmO9iyOgCBai6LoziI3Uo3pQgWozp4YTxZIrYUV3vYqTe6VA&usqp=CAU"
+                    src="https://images.pexels.com/photos/18165007/pexels-photo-18165007/free-photo-of-portrait-of-man-in-eyeglasses.jpeg"
                     alt="Model with glasses"
                 />
 

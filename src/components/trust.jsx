@@ -16,7 +16,7 @@ const Trust = () => {
               WIDE RANGE OF PRODUCTS
             </h5>
             <p className="text-secondary">
-              We have pink salt, spices, baking products, cooking pastes & seasonings — all in one place.
+         Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@ const Trust = () => {
               BEST PRICES & GREAT DEALS
             </h5>
             <p className="text-secondary">
-              Buy top quality food products at low prices. Enjoy daily deals and discounts.
+             Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
             </p>
           </div>
         </div>
@@ -37,10 +37,10 @@ const Trust = () => {
           <div className="choose-box text-center p-4 rounded-4 h-100">
             <i className="fa fa-truck mb-3" style={{ fontSize: 40, color: "#001f54" }}></i>
             <h5 className="fw-bold text-uppercase mb-3" style={{ color: "#001f54" }}>
-              DELIVERY ALL OVER PAKISTAN
+              DELIVERY ALL OVER USA
             </h5>
             <p className="text-secondary">
-              We deliver fast and safely to every city and area in Pakistan.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
             </p>
           </div>
         </div>
@@ -49,10 +49,10 @@ const Trust = () => {
           <div className="choose-box text-center p-4 rounded-4 h-100">
             <i className="fa fa-leaf mb-3" style={{ fontSize: 40, color: "#001f54" }}></i>
             <h5 className="fw-bold text-uppercase mb-3" style={{ color: "#001f54" }}>
-              NATURAL INGREDIENTS
+              ECO FRIENDLY
             </h5>
             <p className="text-secondary">
-              Made with pure and natural ingredients. No harmful chemicals.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
             </p>
           </div>
         </div>
