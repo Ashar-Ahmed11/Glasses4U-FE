@@ -7,9 +7,9 @@ const HeroSlider = ({ slides = [] }) => {
  
   const handleImgError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/logo192.png'; };
 
-  const ImgBlock = ({ s }) => (
+  const ImgBlock = ({ s, fit = "cover" }) => (
     <div className="position-relative h-100" >
-      <img src={getImageSrc(s.imageUrl)} alt={s.title||'slide'} style={{objectFit:"cover"}} className={`${window.innerWidth<768?"":"h-100"}  w-100 hero-img rounded-4`} referrerPolicy="no-referrer" loading="lazy" onError={handleImgError} />
+      <img src={getImageSrc(s.imageUrl)} alt={s.title||'slide'} style={{objectFit:fit}} className={`${window.innerWidth<768?"":"h-100"}  w-100 hero-img rounded-4`} referrerPolicy="no-referrer" loading="lazy" onError={handleImgError} />
         <div className="shade" style={{borderRadius:15,zIndex:20,position:"absolute",top:0,left:0,width:"100%",height:"100%",backgroundColor:"rgba(0,0,0,0.2)"}}></div>
      <div style={{zIndex:30,position:"relative"}} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
         {s.title && <h2 className="fw-bold display-6">{s.title}</h2>}
@@ -20,18 +20,18 @@ const HeroSlider = ({ slides = [] }) => {
   );
 
   return (
-    <div ref={ref} className="keen-slider">
+    <div ref={ref} className="keen-slider hero-slider">
       {slides.map((s, i) => (
         <div className="keen-slider__slide" key={i}>
           {i === 0 && Array.isArray(s.stacked) && s.stacked.length === 2 ? (
             <>
-              <div className="d-none d-lg-block">
-                <div className="container  px-0">
-                  <div className="row g-3  align-items-stretch">
-                    <div className="col-12  col-lg-8"><ImgBlock s={s} /></div>
-                    <div className="col-12  col-lg-4 d-flex flex-column gap-3">
-                      <ImgBlock s={s.stacked[0]} />
-                      <ImgBlock s={s.stacked[1]} />
+              <div className="d-none d-lg-block h-100">
+                <div className="container h-100  px-0">
+                  <div className="row g-3 h-100 align-items-stretch">
+                    <div className="col-12 h-100 col-lg-8"><ImgBlock s={s} fit="cover" /></div>
+                    <div className="col-12 h-100 col-lg-4 d-flex flex-column gap-3">
+                      <ImgBlock s={s.stacked[0]} fit="cover" />
+                      <ImgBlock s={s.stacked[1]} fit="cover" />
                     </div>
                   </div>
                 </div>

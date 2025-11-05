@@ -22,7 +22,11 @@ const Header = () => {
             <img src={logo} alt="Logo" width="36" height="36" className="d-inline-block align-text-top" />
           </Link>
           <ul className="navbar-nav flex-row">
-            <li className="nav-item"><a className="nav-link text-dark px-2" href="/" aria-label="Cart"><i className="fa fa-2x fa-shopping-cart" style={{  color: '#000' }}></i></a></li>
+            <li className="nav-item">
+              <a className="nav-link text-dark px-2" href="#" aria-label="Cart" data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop">
+                <i className="fa fa-2x fa-shopping-cart" style={{ color: '#000' }}></i>
+              </a>
+            </li>
           </ul>
         </div>
       </nav>
@@ -62,7 +66,11 @@ const Header = () => {
           </Link>
           <ul className="navbar-nav flex-row">
             <li className="nav-item me-3"><a className="nav-link text-dark" href="/"><i className="fa fa-map-marker" style={{ fontSize: 22, color: '#000' }}></i></a></li>
-            <li className="nav-item"><a className="nav-link text-dark" href="/"><i className="fa fa-shopping-cart" style={{ fontSize: 22, color: '#000' }}></i></a></li>
+            <li className="nav-item">
+              <a className="nav-link text-dark" href="#" data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop">
+                <i className="fa fa-shopping-cart" style={{ fontSize: 22, color: '#000' }}></i>
+              </a>
+            </li>
           </ul>
         </div>
       </nav>

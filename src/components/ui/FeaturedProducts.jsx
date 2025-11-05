@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
-import { getImageSrc } from '../../utils/imageUrl';
+import AppContext from '../context/appContext';
 import ProductCard from './productCard';
-const FeaturedProducts = ({ slides = [] }) => {
+const FeaturedProducts = () => {
     const [ref] = useKeenSlider({
-        loop: true,
+        
         renderMode: 'auto',
         slides: {
             perView: 2.2, // show 2 full + small portion of previous/next
@@ -23,22 +23,13 @@ const FeaturedProducts = ({ slides = [] }) => {
             }
         }
     });
-    const handleImgError = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/logo192.png'; };
+    const { products } = useContext(AppContext)
     return (
         <>
             <div ref={ref} className="keen-slider px-4">
-                {slides.map((s, i) => (
-                    <div className="keen-slider__slide" key={i}>
-                        <ProductCard/>
-                        {/* <div className="position-relative">
-                            <div className="shade h-100 w-100 rounded-4" style={{ zIndex: 20 }}></div>
-                            <img src={getImageSrc(s.imageUrl)} alt={s.title || 'slide'} className="w-100 featured-img rounded-4" referrerPolicy="no-referrer" loading="lazy" onError={handleImgError} />
-                            <div style={{ zIndex: 30 }} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
-                                {s.title && <h2 className="fw-bold display-6">{s.title}</h2>}
-                                {s.subtitle && <p className="lead mb-3">{s.subtitle}</p>}
-                                {s.cta && <a href={s.cta.href || '/'} className="btn btn-primary btn-lg">{s.cta.label}</a>}
-                            </div>
-                        </div> */}
+                {products.map((p) => (
+                    <div className="keen-slider__slide" key={p._id}>
+                        <ProductCard product={p} to={`/product/${p._id}`} />
                     </div>
                 ))}
             </div>
