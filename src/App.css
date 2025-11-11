@@ -73,6 +73,19 @@
   color: #000;
 }
 
+/* Admin sidebar active/unselected styles */
+.customlinks.nav-link.active {
+  background-color: #fff !important;
+}
+.customlinks.nav-link i { /* default (unselected) icon color */
+  color: #fff !important;
+}
+.customlinks.nav-link.active,
+.customlinks.nav-link.active span,
+.customlinks.nav-link.active i { /* selected: text + icon black */
+  color: #000 !important;
+}
+
 /* Hero slider fixed desktop height */
 @media (min-width: 992px) {
   .hero-slider { height: 600px; }

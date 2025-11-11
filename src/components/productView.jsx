@@ -9,6 +9,7 @@ import AppContext from './context/appContext'
 import ResizePlugin from './resizePlugin'
 import MutationPlugin from './mutationPlugin'
 import ThumbnailPlugin from './thumbnailPlugin'
+import PrescriptionModal from './prescriptionModal'
 
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
@@ -48,7 +49,7 @@ export default function ProductView() {
                 {product.assets?.map((a, i) => (
                   <div className="keen-slider__slide number-slide" key={i}>
                     <div className="d-flex justify-content-center" style={{ position: 'absolute', zIndex: 2, opacity: imgLoaded ? 0 : 1, alignItems: 'center', width: '100%', height: '100%' }}>
-                      <div className="spinner-border text-warning" role="status"/>
+                      <div className="spinner-border text-warning" role="status" />
                     </div>
                     <div className="position-relative" style={{ width: '100%', paddingBottom: '100%', backgroundColor: '#ffffff' }}>
                       <img onLoad={() => setImgLoaded(true)} src={a.url} alt={product.name} className="position-absolute w-100 h-100" style={{ objectFit: 'contain', top: 0 }} />
@@ -83,12 +84,18 @@ export default function ProductView() {
               <button className="btn btn-outline-dark" onClick={() => setQuantity(q => q + 1)}>+</button>
             </div>
 
-            <button className="btn top-bg text-white rounded-pill px-3 py-2 border-2 border-light"  onClick={() => addProduct(product, quantity, selectedSize)}>Add to cart</button>
+            <button className="btn top-bg text-white rounded-pill px-3 py-2 border-2 border-light" onClick={() => addProduct(product, quantity, selectedSize)}>Add to cart</button>
 
             <div className="mt-4" style={{ color }}>
               <div className="fw-semibold mb-2">Description</div>
               <div dangerouslySetInnerHTML={{ __html: product.description }} />
             </div>
+        
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Open Prescription
+            </button>
+
+            <PrescriptionModal/>
           </div>
         </div>
       </div>

@@ -2,11 +2,11 @@ import React, { useContext } from 'react'
 import CartItem from './cartItem'
 import { Link } from 'react-router-dom'
 import AppContext from './context/appContext'
-
+import { useHistory } from 'react-router-dom'
 export default function Cart() {
   const { cart } = useContext(AppContext)
   const color = '#212427'
-
+  const history = useHistory()
   const subtotal = cart.reduce((sum, i) => sum + i.quantity * i.price, 0)
   const fmt = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 
@@ -29,7 +29,7 @@ export default function Cart() {
           </div>
           {subtotal > 0 && (
             <div className="d-flex">
-              <Link to="/checkout" className="btn top-bg text-white" data-bs-dismiss="offcanvas" style={{  width: '100%' }}>Check Out</Link>
+              <button onClick={() => history.push('/checkout')} className="btn top-bg text-white" data-bs-dismiss="offcanvas" style={{  width: '100%' }}>Check Out</button>
             </div>
           )}
         </div>
