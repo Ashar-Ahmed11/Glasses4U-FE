@@ -3,6 +3,8 @@ import Logo from './logo.png'
 import CheckoutItem from './checkoutItem'
 import Spinner from './spinner'
 import AppContext from './context/appContext'
+// import { PayPalButton } from 'react-paypal-button-v2'
+import { PayPalButtons } from '@paypal/react-paypal-js'
 import { useHistory } from 'react-router-dom'
 export default function Checkout() {
 
@@ -39,6 +41,7 @@ export default function Checkout() {
     const [rotate, setRotate] = useState(false)
 
 
+    const paypalAmount = total.toFixed(2)
 
 
     return (
@@ -81,8 +84,8 @@ export default function Checkout() {
                                 <p>Shipping</p>
 
                                 <p>USD {delivery}</p>
-                                   
-                                
+
+
                             </div>
                             <div className="d-flex justify-content-between mt-3">
                                 <p style={{ fontWeight: "bold" }}>Total</p>
@@ -94,7 +97,7 @@ export default function Checkout() {
                     </div>
                 </div>
                 <div className='container-fluid my-3'>
-                    <form onSubmit={(e)=>e.preventDefault()}>
+                    <form onSubmit={(e) => e.preventDefault()}>
                         <div class="mb-3">
                             <p className='my-2' style={{ fontSize: '25px', color: color }} >Contact information</p>
                             <input required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder='Email' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
@@ -148,9 +151,41 @@ export default function Checkout() {
 
                         <div className="d-flex justify-content-between my-3">
 
+
                             <button onClick={() => history.goBack()} style={{ padding: '16.5px', backgroundColor: '#ffffff', border: '1px solid #000000', color: color }} className="btn"><i className="fa fa-chevron-left px-2" aria-hidden="true"></i>Return</button>
-                            <button onClick={async (e)=>{e.preventDefault(); try{ setCheckoutLoader(true); const { url } = await createStripeSession({ items: cart, deliveryCharges: delivery }); window.location.href = url; } catch(err){ setCheckoutLoader(false); alert('Failed to start checkout') } }} disabled={checkoutLoader} style={{ padding: '16.5px', backgroundColor: color, color: 'white' }} className="btn">Proceed</button>
+                            <button onClick={async (e) => { e.preventDefault(); try { setCheckoutLoader(true); const { url } = await createStripeSession({ items: cart, deliveryCharges: delivery }); window.location.href = url; } catch (err) { setCheckoutLoader(false); alert('Failed to start checkout') } }} disabled={checkoutLoader} style={{ padding: '16.5px', backgroundColor: color, color: 'white' }} className="btn">Proceed</button>
                         </div>
+
+                        <PayPalButtons
+                            style={{ disableMaxWidth: true }}
+                            createOrder={(data, actions) => {
+                                return actions.order.create({
+                                    purchase_units: [
+                                        {
+                                            amount: {
+                                                currency_code: "USD",
+                                                value: paypalAmount,
+                                            },
+                                        },
+                                    ],
+                                });
+                            }}
+                            onApprove={(data, actions) => {
+                                return actions.order.capture().then((details) => {
+                                    console.log("Payment successful:", details);
+
+                                    // OPTIONAL: send order info to backend
+                                    // save order, clear cart, redirect, etc.
+
+                                    alert(`Payment completed by ${details.payer.name.given_name}`);
+                                });
+                            }}
+                            onError={(err) => {
+                                console.error("PayPal Error:", err);
+                                alert("PayPal payment failed");
+                            }}
+                        />
+
 
                     </form>
                 </div>
