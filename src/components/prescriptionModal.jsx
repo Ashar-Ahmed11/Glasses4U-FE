@@ -448,7 +448,7 @@ const PrescriptionModal = () => {
                 <div className="row g-3 mt-2">
                   {[
                     { key: 'standard', title: 'STANDARD COATINGS+ $5.95', desc: 'Anti-Reflective, UV and Scratch Resistance' },
-                    // { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.' },
+                    { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.' },
                   ].map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
@@ -460,7 +460,7 @@ const PrescriptionModal = () => {
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
                           <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 80, height: 80 }}>
-                            <span className="fs-3">✨</span>
+                            <span className="fs-3">{item.key === 'standard' ? '✨' : '⭕'}</span>
                           </div>
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
