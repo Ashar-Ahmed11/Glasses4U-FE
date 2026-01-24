@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../logo.png';
-
-const STATIC_CATEGORIES = [
-  { label: 'Eyeglasses', href: '/' },
-  { label: 'Sunglasses', href: '/' },
-  { label: 'Lenses', href: '/' },
-  { label: 'Accessories', href: '/' },
-];
+import AppContext from '../context/appContext';
 
 const Header = () => {
+  const { categories, fetchCategories } = useContext(AppContext)
+  useEffect(() => { fetchCategories() }, [])
+
   return (
     <header className="sticky-top  shadow-sm top-bg">
       {/* Mobile navbar */}
@@ -27,6 +24,14 @@ const Header = () => {
                 <i className="fa fa-2x fa-shopping-cart" style={{ color: '#000' }}></i>
               </a>
             </li>
+            <li className="nav-item dropdown">
+              <a className="nav-link text-dark px-2 dropdown-toggle" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i className="fa fa-2x fa-user" style={{ color: '#000' }}></i>
+              </a>
+              <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuMobile">
+                <li><Link className="dropdown-item" to="/login" data-bs-dismiss="offcanvas">Login</Link></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </nav>
@@ -39,9 +44,11 @@ const Header = () => {
         </div>
         <div className="offcanvas-body">
           <ul className="navbar-nav">
-            {STATIC_CATEGORIES.map((c, idx) => (
+            {(categories || []).map((c, idx) => (
               <li className="nav-item" key={idx}>
-                <Link className="nav-link fs-4 text-dark" to={c.href} data-bs-dismiss="offcanvas">{c.label}</Link>
+                <Link className="nav-link fs-4 text-dark" to={`/category/${c._id}`} data-bs-dismiss="offcanvas">
+                  {c.mainHeading}
+                </Link>
               </li>
             ))}
           </ul>
@@ -71,6 +78,14 @@ const Header = () => {
                 <i className="fa fa-shopping-cart" style={{ fontSize: 22, color: '#000' }}></i>
               </a>
             </li>
+            <li className="nav-item dropdown ms-2">
+              <a className="nav-link text-dark dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i className="fa fa-user" style={{ fontSize: 22, color: '#000' }}></i>
+              </a>
+              <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                <li><Link className="dropdown-item" to="/login">Login</Link></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </nav>
@@ -79,9 +94,11 @@ const Header = () => {
       <div className="d-none d-lg-block border-top border-dark">
         <div className="container-fluid">
           <ul className="nav justify-content-center py-2">
-            {STATIC_CATEGORIES.map((c, idx) => (
+            {(categories || []).map((c, idx) => (
               <li className="nav-item mx-3" key={idx}>
-                <Link className="nav-link fw-semibold text-dark" to={c.href}>{c.label}</Link>
+                <Link className="nav-link fw-semibold text-dark" to={`/category/${c._id}`}>
+                  {c.mainHeading}
+                </Link>
               </li>
             ))}
           </ul>

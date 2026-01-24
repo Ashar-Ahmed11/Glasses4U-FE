@@ -1,13 +1,44 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import AppContext from '../context/appContext'
 
 export default function Home() {
+    const { fetchOrders, fetchAllProductsBE } = React.useContext(AppContext)
+    const [revenue, setRevenue] = React.useState(0)
+    const [ordersCount, setOrdersCount] = React.useState(0)
+    const [productCount, setProductCount] = React.useState(0)
+    const [soldCount, setSoldCount] = React.useState(0)
     const numbers = React.useMemo(() => ({
-        revenue: Math.floor(Math.random() * 90000) + 10000,
-        totalProducts: Math.floor(Math.random() * 900) + 100,
-        totalSold: Math.floor(Math.random() * 5000) + 500,
-        totalOrders: Math.floor(Math.random() * 2000) + 200,
-    }), [])
+        revenue,
+        totalProducts: productCount,
+        totalSold: soldCount,
+        totalOrders: ordersCount,
+    }), [revenue, productCount, soldCount, ordersCount])
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                // Orders based KPIs
+                const orders = await fetchOrders()
+                const revenueSum = (orders || []).reduce((acc, o) => acc + Number(o?.total || 0), 0)
+                setRevenue(Math.round(revenueSum))
+                setOrdersCount(Array.isArray(orders) ? orders.length : 0)
+
+                // Products KPIs
+                const products = await fetchAllProductsBE()
+                setProductCount(Array.isArray(products) ? products.length : 0)
+
+                // Total sold = sum of all line quantities across orders
+                const sold = (orders || []).reduce((acc, o) => {
+                    const qty = (o?.products || []).reduce((q, line) => q + Number(line?.quantity || 0), 0)
+                    return acc + qty
+                }, 0)
+                setSoldCount(sold)
+            } catch (e) {
+                // keep previous numbers on error
+            }
+        })()
+    }, [fetchOrders, fetchAllProductsBE])
     return (
         <div className="container py-4">
             

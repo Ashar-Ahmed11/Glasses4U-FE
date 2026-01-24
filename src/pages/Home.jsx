@@ -16,6 +16,7 @@ import PaymentOptions from '../components/ui/PaymentOptions';
 import ShopByPrice from '../components/ui/ShopByPrice';
 import { Link } from 'react-router-dom';
 import AppContext from '../components/context/appContext';
+import TrackOrder from '../components/TrackOrder';
 const Home = () => {
     const { products } = useContext(AppContext)
     return (
@@ -43,6 +44,7 @@ const Home = () => {
                 <SecHero />
 
             </main>
+            <TrackOrder />
             <p data-aos="fade-up" data-aos-duration="1000" className="display-4 text-center my-5" style={{ fontWeight: 900 }}>SUNGLASSES OF MONTH     </p>
 
             <FeaturedEyewear slides={featuredSlides} />

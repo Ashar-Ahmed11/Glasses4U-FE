@@ -24,7 +24,7 @@ export default function CreateProduct() {
     const [imgPreview, setImgPreview] = useState([])
     const modalRef = useRef(null)
 
-
+    
     useEffect(() => {
         setImgPreview([])
         fetchCategories()
@@ -32,7 +32,23 @@ export default function CreateProduct() {
 
 
 
-    const [components, setComponents] = useState({ namer: "", price: "", description: "", category: "", homePreview: false, youtubeLink: '' })
+    const [components, setComponents] = useState({
+        namer: "",
+        price: "",
+        description: "",
+        category: "",
+        homePreview: false,
+        youtubeLink: '',
+        frameSpecs: {
+            lensWidth: '',
+            noseBridge: '',
+            templeArm: '',
+            size: '',
+            color: '',
+            shape: '',
+            material: ''
+        }
+    })
     console.log(components.category)
     const dispatchProduct = async (e) => {
         e.preventDefault()
@@ -45,7 +61,16 @@ export default function CreateProduct() {
             youtubeLink: components.youtubeLink,
             priceAED: Number(components.priceAED || 0),
             assets: imgPreview.map((x) => ({ url: x.url || x })),
-            variants
+            variants,
+            frameSpecs: {
+                lensWidth: components.frameSpecs.lensWidth ? Number(components.frameSpecs.lensWidth) : undefined,
+                noseBridge: components.frameSpecs.noseBridge ? Number(components.frameSpecs.noseBridge) : undefined,
+                templeArm: components.frameSpecs.templeArm ? Number(components.frameSpecs.templeArm) : undefined,
+                size: components.frameSpecs.size || '',
+                color: components.frameSpecs.color || '',
+                shape: components.frameSpecs.shape || '',
+                material: components.frameSpecs.material || ''
+            }
         }
         if (prodid) await editProductBE(prodid, payload)
         else await createProductBE(payload)
@@ -83,8 +108,26 @@ export default function CreateProduct() {
         if (prodid) (async () => {
             const data = await fetchSingleProductBE(prodid)
             if (data) {
-                const { name, price, description, youtubeLink, homePreview, category, priceAED, _id, variants: vs, assets } = data
-                setComponents({ namer: name, price: price, description: description, youtubeLink: youtubeLink, homePreview: homePreview, category: category, priceAED: priceAED, _id: _id })
+                const { name, price, description, youtubeLink, homePreview, category, priceAED, _id, variants: vs, assets, frameSpecs } = data
+                setComponents({
+                    namer: name,
+                    price: price,
+                    description: description,
+                    youtubeLink: youtubeLink,
+                    homePreview: homePreview,
+                    category: category,
+                    priceAED: priceAED,
+                    _id: _id,
+                    frameSpecs: {
+                        lensWidth: frameSpecs?.lensWidth ?? '',
+                        noseBridge: frameSpecs?.noseBridge ?? '',
+                        templeArm: frameSpecs?.templeArm ?? '',
+                        size: frameSpecs?.size ?? '',
+                        color: frameSpecs?.color ?? '',
+                        shape: frameSpecs?.shape ?? '',
+                        material: frameSpecs?.material ?? ''
+                    }
+                })
                 setVariants(vs || [])
                 setImgPreview(assets || [])
             }
@@ -124,7 +167,7 @@ export default function CreateProduct() {
                     <form>
 
                         <input value={components.namer} onChange={(e) => setComponents({ ...components, namer: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="text" placeholder='Product Name' className="form-control my-2" />
-                        <input value={components.price} onChange={(e) => setComponents({ ...components, price: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="text" placeholder='Product Price PKR' className="form-control my-2" />
+                        <input value={components.price} onChange={(e) => setComponents({ ...components, price: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="text" placeholder='Product Price USD' className="form-control my-2" />
                         {/* <input value={components.priceAED} onChange={(e) => setComponents({ ...components, priceAED: e.target.value })} style={{ color: color, backgroundColor: 'white',}} type="text" placeholder='Product Price AED' className="form-control my-2" /> */}
 
                         <VariantsManager variants={variants} setVariants={setVariants} />
@@ -185,6 +228,32 @@ export default function CreateProduct() {
                                 ))}
                             </select>
 
+                            <div className="my-3 p-3 border rounded">
+                                <h5 className="mb-3">Frame Specs</h5>
+                                <div className="row g-2">
+                                    <div className="col-6 col-md-4">
+                                        <input value={components.frameSpecs.lensWidth} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, lensWidth: e.target.value } })} className="form-control" type="number" placeholder="Lens Width (mm)" />
+                                    </div>
+                                    <div className="col-6 col-md-4">
+                                        <input value={components.frameSpecs.noseBridge} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, noseBridge: e.target.value } })} className="form-control" type="number" placeholder="Nose Bridge (mm)" />
+                                    </div>
+                                    <div className="col-6 col-md-4">
+                                        <input value={components.frameSpecs.templeArm} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, templeArm: e.target.value } })} className="form-control" type="number" placeholder="Temple Arm (mm)" />
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <input value={components.frameSpecs.size} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, size: e.target.value } })} className="form-control" type="text" placeholder="Size" />
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <input value={components.frameSpecs.color} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, color: e.target.value } })} className="form-control" type="text" placeholder="Color" />
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <input value={components.frameSpecs.shape} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, shape: e.target.value } })} className="form-control" type="text" placeholder="Shape" />
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <input value={components.frameSpecs.material} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, material: e.target.value } })} className="form-control" type="text" placeholder="Material" />
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
 
@@ -232,7 +301,7 @@ export default function CreateProduct() {
                         <div className="modal-body">
                             <div className="px-2">
                                 <ImageAdjuster imageUrl={editImageUrl} setEditImageUrl={setEditImageUrl} onUploaded={(url) => setImgPreview([...imgPreview, { url }])} />
-                            </div>
+                        </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>

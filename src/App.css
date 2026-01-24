@@ -58,6 +58,23 @@
 .shade { background-color: rgba(0, 0, 0, .2); position: absolute; }
 
 /* Sticky navbar on top on mobile */
+
+/* Product gallery aspect ratio:
+   - Mobile: square (100%)
+   - Desktop (md+): 16:9 (56.25%) */
+.product-main-frame { padding-bottom: 100%; }
+@media (min-width: 768px) {
+  .product-main-frame { padding-bottom: 56.25%; }
+}
+
+/* Equal height for order modals (orders details and prescription) */
+.equal-modal .modal-content {
+  height: 72vh;           /* fixed matching height */
+}
+.equal-modal .modal-body {
+  max-height: calc(72vh - 120px);  /* account for header/footer */
+  overflow: auto;
+}
 .navbar.sticky-top { z-index: 1100; background-color: #fff !important; }
 
 

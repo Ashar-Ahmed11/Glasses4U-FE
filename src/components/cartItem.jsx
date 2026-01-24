@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import AppContext from './context/appContext'
 
-export default function CartItem({ data }) {
+export default function CartItem({ data, onViewPrescription }) {
   const { updateProduct, removeProduct } = useContext(AppContext)
   const { image, name, quantity, localePrice } = data
   const color = '#212427'
@@ -21,8 +21,12 @@ export default function CartItem({ data }) {
                 <button style={{ borderColor: color, color }} onClick={() => updateProduct(data, quantity - 1)} className="btn">-</button>
                 <p style={{ color }} className="card-text mx-2 mb-0">{quantity}</p>
                 <button style={{ borderColor: color, color }} onClick={() => updateProduct(data, quantity + 1)} className="btn">+</button>
+              
               </div>
+              {data.prescription && <button onClick={() => onViewPrescription && onViewPrescription(data)} className="btn btn-outline-secondary btn-sm mt-2">View Prescription</button>}
+
               <p style={{ color }} className="card-text py-2">{localePrice}</p>
+
             </div>
           </div>
         </div>

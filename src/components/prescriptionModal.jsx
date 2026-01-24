@@ -29,9 +29,9 @@ const Select = ({ values, value, onChange, sign = false, decimals = 2 }) => (
   </select>
 )
 
-const PrescriptionModal = () => {
+const PrescriptionModal = ({ onComplete }) => {
   const { lenses, fetchLenses } = React.useContext(AppContext)
-  const [form, setForm] = React.useState({
+  const INITIAL_FORM = {
     // OD (Right)
     od_sph: -1.0,
     od_cyl: -1.5,
@@ -47,13 +47,24 @@ const PrescriptionModal = () => {
     right_pd: 31.5,
     left_pd: 31.5,
     name: '',
-  })
+  }
+  const [form, setForm] = React.useState(INITIAL_FORM)
   const [hasTwoPD, setHasTwoPD] = React.useState(false)
   const [step, setStep] = React.useState(1)
   const [rxType, setRxType] = React.useState(null) // 'distance' | 'reading' | 'bifocal' | 'progressive'
   const [lensType, setLensType] = React.useState(null) // 'clear' | 'photochromic'
   const [lensOption, setLensOption] = React.useState(null) // '1.56' | '1.61' | '1.67'
   const [coating, setCoating] = React.useState(null) // 'standard' | 'none'
+
+  const resetAll = React.useCallback(() => {
+    setForm(INITIAL_FORM)
+    setHasTwoPD(false)
+    setStep(1)
+    setRxType(null)
+    setLensType(null)
+    setLensOption(null)
+    setCoating(null)
+  }, [])
 
   // Fetch lenses for Step 4 based on selections from steps 2 and 3
   React.useEffect(() => {
@@ -63,6 +74,15 @@ const PrescriptionModal = () => {
       fetchLenses({ rxType: RX_MAP[rxType], lensType: LT_MAP[lensType] })
     }
   }, [step, rxType, lensType, fetchLenses])
+
+  // Reset when modal is closed
+  React.useEffect(() => {
+    const el = document.getElementById('exampleModal')
+    if (!el) return
+    const handler = () => resetAll()
+    el.addEventListener('hidden.bs.modal', handler)
+    return () => el.removeEventListener('hidden.bs.modal', handler)
+  }, [resetAll])
 
     return (
     <div
@@ -418,7 +438,7 @@ const PrescriptionModal = () => {
                     const titleUpper = String(item.title || '').toUpperCase()
                     const priceLabel = `$${Number(item.price || 0).toFixed(2)}`
                     const heading = `${[thicknessLabel, titleUpper].filter(Boolean).join(' ')}+ ${priceLabel}`
-                    return (
+    return (
                     <div key={item._id} className="col-12 col-md-6">
                       <button
                         type="button"
@@ -468,8 +488,37 @@ const PrescriptionModal = () => {
                     </div>
                   ))}
                     </div>
-                <div className="d-flex justify-content-start mt-4">
+                <div className="d-flex justify-content-between mt-4">
                   <button type="button" className="btn btn-outline-secondary" onClick={() => setStep(4)}>Previous</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => {
+                      const lens = (lenses || []).find((l) => String(l._id) === String(lensOption)) || null
+                      const coatingMap = { standard: { key: 'standard', title: 'Standard Coatings', price: 5.95 }, none: { key: 'none', title: 'No Coatings', price: 0 } }
+                      const payload = {
+                        rxType,
+                        lensType,
+                        lens: lens ? { id: lens._id, title: lens.title, price: Number(lens.price || 0), thickness: lens.thickness } : null,
+                        coating: coatingMap[coating] || { key: 'none', title: 'No Coatings', price: 0 },
+                        prescription: {
+                          hasTwoPD,
+                          od: { sph: form.od_sph, cyl: form.od_cyl, axis: form.od_axis, add: form.od_add },
+                          os: { sph: form.os_sph, cyl: form.os_cyl, axis: form.os_axis, add: form.os_add },
+                          pd: hasTwoPD ? { right: form.right_pd, left: form.left_pd } : form.pd,
+                          name: form.name,
+                        },
+                      }
+                      try { onComplete && onComplete(payload) } catch {}
+                      const el = document.getElementById('exampleModal')
+                      const bs = window?.bootstrap
+                      if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).hide()
+                      // Ensure state resets immediately after adding to cart
+                      resetAll()
+                    }}
+                  >
+                    Add To Cart
+                  </button>
                     </div>
               </>
             )}

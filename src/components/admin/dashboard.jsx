@@ -20,6 +20,7 @@ import AppContext from "../context/appContext";
 import ViewCategories from "./viewCategories";
 import Eyewear from "./eyewear";
 import CreateLens from "./createLens";
+import Orders from "./orders";
 
 // import { useEffect } from "react";
 const Dashboard = () => {
@@ -159,7 +160,7 @@ const Dashboard = () => {
                  
                         <Switch>
                             <Route exact path="/dashboard/">
-                                <Home/>
+                            <Home/>
                             </Route>
                             <Route exact path="/dashboard/create-product">
                                 <CreateProduct />
@@ -190,6 +191,9 @@ const Dashboard = () => {
                             </Route>
                             <Route exact path="/dashboard/basic-info">
                                 <BasicInfo />
+                            </Route>
+                            <Route exact path="/dashboard/orders">
+                                <Orders />
                             </Route>
                             <Route exact path="/dashboard/transaction">
                                 <h1 className="text-center">Transaction</h1>

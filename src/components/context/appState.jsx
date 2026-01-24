@@ -98,9 +98,31 @@ const AppState = (props) => {
   const [cart, setCart] = useLocalStorage('cart2', [])
   const [adminToken, setAdminToken] = useState(localStorage.getItem('auth-token') || '')
   const [adminLoading, setAdminLoading] = useState(false)
+  const [userToken, setUserToken] = useState(localStorage.getItem('user-token') || '')
+  const [user, setUser] = useState(null)
   const [basicInfo, setBasicInfo] = useState(null)
   const [categories, setCategories] = useState([])
   const [lenses, setLenses] = useState([])
+
+  // helper to extract validator / server errors nicely
+  const extractError = async (res, fallback = 'Request failed') => {
+    try {
+      const data = await res.clone().json()
+      if (Array.isArray(data?.errors) && data.errors.length) {
+        return data.errors.map((e) => e.msg).join('\n')
+      }
+      if (data?.message) return data.message
+      if (typeof data === 'string') return data
+    } catch (_) {
+      // ignore json parse error
+    }
+    try {
+      const text = await res.text()
+      return text || fallback
+    } catch {
+      return fallback
+    }
+  }
 
   const addProduct = (product, quantity, selectedSize) => {
     const itemId = selectedSize ? `${product._id}${selectedSize._id}` : product._id
@@ -126,6 +148,48 @@ const AppState = (props) => {
     openCart()
   }
 
+  // Add product with prescription, lens and coating
+  const addProductWithPrescription = (product, quantity, selectedSize, prescription) => {
+    const lensId = prescription?.lens?.id || 'nolens'
+    const coatingKey = prescription?.coating?.key || 'nocoat'
+    const sizeKey = selectedSize ? selectedSize._id : 'base'
+    // Build a stable key from prescription values so any change makes a unique cart line
+    const rx = prescription?.prescription || {}
+    const rxKey = [
+      `rx:${prescription?.rxType || ''}`,
+      `lt:${prescription?.lensType || ''}`,
+      `od:${[rx?.od?.sph, rx?.od?.cyl, rx?.od?.axis, rx?.od?.add].map((v) => v ?? '').join(',')}`,
+      `os:${[rx?.os?.sph, rx?.os?.cyl, rx?.os?.axis, rx?.os?.add].map((v) => v ?? '').join(',')}`,
+      `pd:${rx?.hasTwoPD ? [rx?.pd?.right ?? '', rx?.pd?.left ?? ''].join(',') : (rx?.pd ?? '')}`,
+    ].join('|')
+    const itemId = `${product._id}|${sizeKey}|${lensId}|${coatingKey}|${rxKey}`
+    const basePrice = selectedSize ? selectedSize.price : product.price
+    const lensPrice = Number(prescription?.lens?.price || 0)
+    const coatingPrice = Number(prescription?.coating?.price || 0)
+    const unitPrice = Number(basePrice) + lensPrice + coatingPrice
+
+    const existing = cart.find((e) => e.id === itemId)
+    if (existing) {
+      const updated = cart.map((e) => (e.id === itemId ? { ...e, quantity: e.quantity + quantity } : e))
+      setCart(updated)
+    } else {
+      setCart([
+        ...cart,
+        {
+          id: itemId,
+          name: product.name,
+          image: product.assets?.[0]?.url || 'https://static.zennioptical.com/production/products/general/19/54/195421-eyeglasses-front-view.jpg?output-quality=90&resize=500px:*',
+          price: unitPrice,
+          localePrice: priceConverter(unitPrice),
+          quantity,
+          variant: selectedSize || null,
+          prescription, // include full details for order creation
+        },
+      ])
+    }
+          openCart()
+  }
+
   const updateProduct = (item, quantity) => {
     if (quantity < 1) {
       setCart(cart.filter((e) => e.id !== item.id))
@@ -144,7 +208,7 @@ const AppState = (props) => {
         body: JSON.stringify({ username, password }),
       })
       if (!res.ok) {
-        const msg = await res.text()
+        const msg = await extractError(res, 'Login failed')
         throw new Error(msg || 'Login failed')
       }
       const data = await res.json()
@@ -166,17 +230,127 @@ const AppState = (props) => {
     toast.info('Logged out')
   }
 
+  // User Auth
+  const userRegister = async ({ firstName, lastName, email, password }) => {
+    try {
+      setAdminLoading(true)
+      const name = `${firstName} ${lastName}`.trim()
+      const res = await fetch(`${API_BASE}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      })
+      if (!res.ok) {
+        const msg = await extractError(res, 'Registration failed')
+        throw new Error(msg || 'Registration failed')
+      }
+      const data = await res.json()
+      localStorage.setItem('user-token', data.authToken)
+      setUserToken(data.authToken)
+      toast.success('Registered successfully')
+      return true
+    } catch (e) {
+      toast.error(e.message)
+      return false
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+  const userLogin = async ({ email, password }) => {
+    try {
+      setAdminLoading(true)
+      const res = await fetch(`${API_BASE}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        const msg = await extractError(res, 'Login failed')
+        throw new Error(msg || 'Login failed')
+      }
+      const data = await res.json()
+      localStorage.setItem('user-token', data.authToken)
+      setUserToken(data.authToken)
+      toast.success('Logged in')
+      return true
+    } catch (e) {
+      toast.error(e.message)
+      return false
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+  const userLogout = () => {
+    localStorage.removeItem('user-token')
+    setUserToken('')
+    setUser(null)
+    toast.info('Logged out')
+  }
+  const getUser = async () => {
+    if (!userToken) return null
+    const res = await fetch(`${API_BASE}/api/users/me`, { headers: { 'auth-token': userToken } })
+    if (!res.ok) return null
+    const data = await res.json()
+    setUser(data)
+    return data
+  }
+  const updateUser = async (payload) => {
+    const res = await fetch(`${API_BASE}/api/users/me`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'auth-token': userToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const msg = await extractError(res, 'Update failed')
+      throw new Error(msg)
+    }
+    const data = await res.json()
+    setUser(data)
+    toast.success('Profile updated')
+    return data
+  }
+  const addToWishlist = async (productId) => {
+    const res = await fetch(`${API_BASE}/api/users/wishlist/${productId}`, { method: 'POST', headers: { 'auth-token': userToken } })
+    if (!res.ok) throw new Error('Add to wishlist failed')
+    const data = await res.json()
+    setUser(data)
+    toast.success('Added to wishlist')
+    return data
+  }
+  const removeFromWishlist = async (productId) => {
+    const res = await fetch(`${API_BASE}/api/users/wishlist/${productId}`, { method: 'DELETE', headers: { 'auth-token': userToken } })
+    if (!res.ok) throw new Error('Remove from wishlist failed')
+    const data = await res.json()
+    setUser(data)
+    toast.info('Removed from wishlist')
+    return data
+  }
+  const getUserOrders = async (userId) => {
+    const res = await fetch(`${API_BASE}/api/orders/user/${userId}`)
+    if (!res.ok) throw new Error('Fetch user orders failed')
+    return await res.json()
+  }
+
   // Products (BE)
   const fetchAllProductsBE = async () => {
     const res = await fetch(`${API_BASE}/api/products/allproducts`)
     const data = await res.json()
-    setProducts(data || [])
-    return data
+    const mapped = (data || []).map((p) => ({
+      ...p,
+      localePrice: priceConverter(Number(p?.price || 0)),
+    }))
+    setProducts(mapped)
+    return mapped
   }
   const fetchSingleProductBE = async (id) => {
     const res = await fetch(`${API_BASE}/api/products/singleproduct/${id}`)
     return await res.json()
   }
+  const fetchProductsByCategoryId = async (categoryId) => {
+    const res = await fetch(`${API_BASE}/api/products/bycategory/${categoryId}`)
+    const data = await res.json()
+    return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
+            }
   const createProductBE = async (payload) => {
     const res = await fetch(`${API_BASE}/api/products/createproduct`, {
       method: 'POST',
@@ -268,7 +442,7 @@ const AppState = (props) => {
     if (!res.ok) {
       const msg = await res.text()
       throw new Error(msg || 'Update failed')
-    }
+      }
     const data = await res.json()
     setBasicInfo(data)
     toast.success('Basic info updated')
@@ -302,7 +476,7 @@ const AppState = (props) => {
     } else {
       const trigger = document.querySelector('[data-bs-target="#staticBackdrop"]')
       if (trigger) trigger.click()
-    }
+      }
   }
 
   // Upload (Cloudinary via backend)
@@ -359,8 +533,44 @@ const AppState = (props) => {
     return true
   }
 
+  // Orders
+  const createOrder = async (payload) => {
+    const res = await fetch(`${API_BASE}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const msg = await res.text()
+      throw new Error(msg || 'Create order failed')
+    }
+    return await res.json()
+  }
+  const clearCart = () => setCart([])
+
+  // Orders (Admin)
+  const fetchOrders = async () => {
+    const res = await fetch(`${API_BASE}/api/orders`)
+    if (!res.ok) throw new Error('Fetch orders failed')
+    return await res.json()
+  }
+  const updateOrderStatus = async (id, status) => {
+    const res = await fetch(`${API_BASE}/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify({ status }),
+    })
+    if (!res.ok) throw new Error('Update status failed')
+    return await res.json()
+  }
+  const fetchOrderByTracking = async (trackingId) => {
+    const res = await fetch(`${API_BASE}/api/orders/track/${trackingId}`)
+    if (!res.ok) throw new Error('Order not found')
+    return await res.json()
+  }
+
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, updateProduct, removeProduct, openCart, adminToken, adminLoading, adminLogin, adminLogout, fetchAllProductsBE, fetchSingleProductBE, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, fetchOrders, updateOrderStatus, fetchOrderByTracking }}>
             {props.children}
         </AppContext.Provider>
     )

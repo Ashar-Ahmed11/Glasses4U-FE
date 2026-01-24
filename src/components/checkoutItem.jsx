@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image } from 'cloudinary-react'
 import { Transformation } from 'cloudinary-react'
-export default function CheckoutItem({ element }) {
+export default function CheckoutItem({ element, onViewPrescription }) {
     const { name, price, image, quantity, localePrice } = element
     // console.log(element);
 
@@ -29,7 +29,7 @@ export default function CheckoutItem({ element }) {
                     {name}</span>
                     <span className='opacity-75'>
                     {element?.variant?.variant}</span>
-
+                    {element?.prescription && <button onClick={() => onViewPrescription && onViewPrescription(element)} className="btn btn-outline-secondary btn-sm mt-2">View Prescription</button>}
                     </div>
             
 

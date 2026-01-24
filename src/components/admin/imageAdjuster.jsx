@@ -106,7 +106,7 @@ export default function ImageAdjuster({ imageUrl, setEditImageUrl, onUploaded, m
 								image={image}
 								crop={crop}
 								zoom={zoom}
-								aspect={1}
+								aspect={16 / 9}
 								onCropChange={setCrop}
 								onZoomChange={setZoom}
 								onCropComplete={onCropComplete}

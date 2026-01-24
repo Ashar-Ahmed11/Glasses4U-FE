@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react'
 import Logo from './logo.png'
 import CheckoutItem from './checkoutItem'
 import Spinner from './spinner'
+import { toast } from 'react-toastify'
 import AppContext from './context/appContext'
 // import { PayPalButton } from 'react-paypal-button-v2'
 import { PayPalButtons } from '@paypal/react-paypal-js'
@@ -10,8 +11,17 @@ export default function Checkout() {
 
 
     const history = useHistory()
-    const { basicInfo, cart, createStripeSession, getBasicInfo } = useContext(AppContext)
+    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken } = useContext(AppContext)
     const [checkoutLoader, setCheckoutLoader] = useState(false)
+    const [rxItem, setRxItem] = useState(null)
+    const RX_LABEL = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
+    const LT_LABEL = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun' }
+    const openRx = (item) => {
+        setRxItem(item)
+        const el = document.getElementById('checkoutRxModal')
+        const bs = window?.bootstrap
+        if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).show()
+    }
 
 
 
@@ -20,9 +30,28 @@ export default function Checkout() {
 
     const products = cart.map((element) => { return element.quantity + "x " + element.name + `(${element?.variant?.variant || ""})` + " " })
     const finalProducts = { ...products }
-    const [form, setForm] = useState({ firstname: "", lastname: "", email: "", phone: "", address: "", city: "", products: finalProducts })
+    const [form, setForm] = useState({ firstname: "", lastname: "", email: "", phone: "", address: "", city: "", country: "", postalCode: "", products: finalProducts })
 
     useEffect(() => { if (!basicInfo) getBasicInfo() }, [basicInfo, getBasicInfo])
+    // Prefill from logged-in user's general info
+    useEffect(() => {
+        (async () => {
+            if (!userToken) return
+            const u = await getUser()
+            if (!u) return
+            setForm((prev) => ({
+                ...prev,
+                firstname: prev.firstname || (u.name ? String(u.name).split(' ')[0] : ''),
+                lastname: prev.lastname || (u.name ? String(u.name).split(' ').slice(1).join(' ') : ''),
+                email: prev.email || u.email || '',
+                phone: prev.phone || u.phone || '',
+                address: prev.address || u.address || '',
+                city: prev.city || u.city || '',
+                country: prev.country || u.country || '',
+                postalCode: prev.postalCode || u.postalCode || '',
+            }))
+        })()
+    }, [userToken, getUser])
 
 
 
@@ -42,6 +71,13 @@ export default function Checkout() {
 
 
     const paypalAmount = total.toFixed(2)
+    const isFormValid = [form.firstname, form.lastname, form.email, form.phone, form.address, form.city].every((v) => String(v || '').trim() !== '')
+    const openPayPal = () => {
+        if (!isFormValid) return
+        const el = document.getElementById('paypalModal')
+        const bs = window?.bootstrap
+        if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).show()
+    }
 
 
     return (
@@ -69,7 +105,7 @@ export default function Checkout() {
                         <div>
 
                             {cart.map((element) => {
-                                return <  CheckoutItem element={element} />
+                                return <  CheckoutItem key={element.id} element={element} onViewPrescription={openRx} />
                             })}
                         </div>
                         <div className='mt-4' style={{ color: color }}>
@@ -107,11 +143,7 @@ export default function Checkout() {
                             <p className='my-2' style={{ fontSize: '25px', color: color }} >Shipping address</p>
 
 
-                            <select required placeholder='Country/Region' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} class="form-select" aria-label="Default select example">
-                                <option selected>Pakistan</option>
-
-
-                            </select>
+                            <input required value={form.country || ''} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder='Country/Region' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control" />
 
                             <div className="d-flex justify-content-between my-4">
                                 <input required value={form.firstname} onChange={(e) => setForm({ ...form, firstname: e.target.value })} placeholder='First Name' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
@@ -123,7 +155,7 @@ export default function Checkout() {
                             </div>
                             <div className="d-flex justify-content-between my-4">
                                 <input required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder='City' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
-                                <input required placeholder='Postal Code' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
+                                <input required value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} placeholder='Postal Code' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
                             </div>
                             <div className="d-flex  my-4">
                                 <input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder='WhatsApp Number' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
@@ -153,41 +185,179 @@ export default function Checkout() {
 
 
                             <button onClick={() => history.goBack()} style={{ padding: '16.5px', backgroundColor: '#ffffff', border: '1px solid #000000', color: color }} className="btn"><i className="fa fa-chevron-left px-2" aria-hidden="true"></i>Return</button>
-                            <button onClick={async (e) => { e.preventDefault(); try { setCheckoutLoader(true); const { url } = await createStripeSession({ items: cart, deliveryCharges: delivery }); window.location.href = url; } catch (err) { setCheckoutLoader(false); alert('Failed to start checkout') } }} disabled={checkoutLoader} style={{ padding: '16.5px', backgroundColor: color, color: 'white' }} className="btn">Proceed</button>
+                            <button onClick={(e) => { e.preventDefault(); openPayPal() }} disabled={checkoutLoader || !isFormValid} style={{ padding: '16.5px', backgroundColor: color, color: 'white' }} className="btn">Proceed</button>
                         </div>
 
-                        <PayPalButtons
-                            style={{ disableMaxWidth: true }}
-                            createOrder={(data, actions) => {
-                                return actions.order.create({
-                                    purchase_units: [
-                                        {
-                                            amount: {
-                                                currency_code: "USD",
-                                                value: paypalAmount,
-                                            },
-                                        },
-                                    ],
-                                });
-                            }}
-                            onApprove={(data, actions) => {
-                                return actions.order.capture().then((details) => {
-                                    console.log("Payment successful:", details);
-
-                                    // OPTIONAL: send order info to backend
-                                    // save order, clear cart, redirect, etc.
-
-                                    alert(`Payment completed by ${details.payer.name.given_name}`);
-                                });
-                            }}
-                            onError={(err) => {
-                                console.error("PayPal Error:", err);
-                                alert("PayPal payment failed");
-                            }}
-                        />
+                        {/* PayPal Modal */}
+                        <div className="modal fade" id="paypalModal" tabIndex="-1" aria-hidden="true">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Complete Payment</h5>
+                                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <PayPalButtons
+                                            style={{ disableMaxWidth: true }}
+                                            createOrder={(data, actions) => {
+                                                return actions.order.create({
+                                                    purchase_units: [
+                                                        {
+                                                            amount: {
+                                                                currency_code: "USD",
+                                                                value: paypalAmount,
+                                                            },
+                                                        },
+                                                    ],
+                                                });
+                                            }}
+                                            onApprove={(data, actions) => {
+                                                return actions.order.capture().then(async (details) => {
+                                                    try {
+                                                        const currentUser = userToken ? await getUser() : null
+                                                        const productsPayload = cart.map((item) => {
+                                                            const productId = String(item.id || '').split('|')[0]
+                                                            return {
+                                                                product: productId || undefined,
+                                                                prescription: item.prescription || null,
+                                                                quantity: item.quantity,
+                                                                lens: item.prescription?.lens?.id || null,
+                                                                coating: { enum: item.prescription?.coating?.key || 'none', price: Number(item.prescription?.coating?.price || 0) },
+                                                            }
+                                                        })
+                                                        const orderPayload = {
+                                                            name: `${form.firstname} ${form.lastname}`.trim(),
+                                                            email: form.email,
+                                                            products: productsPayload,
+                                                            subtotal: Number(totalCal.toFixed(2)),
+                                                            deliveryCharges: Number(delivery),
+                                                            total: Number((totalCal + delivery).toFixed(2)),
+                                                            country: form.country || '',
+                                                            city: form.city,
+                                                            phone: form.phone,
+                                                            address: form.address,
+                                                            postalCode: form.postalCode || '',
+                                                            user: currentUser?._id || undefined,
+                                                            status: 'Pending Approval',
+                                                        }
+                                                        toast.success('Payment Successful, Please Wait!')
+                                                        const saved = await createOrder(orderPayload)
+                                                        if (saved?.trackingId) localStorage.setItem('lastTrackingId', String(saved.trackingId))
+                                                        clearCart()
+                                                        const el = document.getElementById('paypalModal')
+                                                        const bs = window?.bootstrap
+                                                        if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).hide()
+                                                        window.location.href = '/success'
+                                                    } catch (err) {
+                                                        console.error('Order creation failed:', err)
+                                                        alert('Order creation failed')
+                                                    }
+                                                });
+                                            }}
+                                            onError={(err) => {
+                                                console.error("PayPal Error:", err);
+                                                alert("PayPal payment failed");
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
                     </form>
+                </div>
+            </div>
+            {/* Prescription summary modal (Checkout) */}
+            <div className="modal fade" id="checkoutRxModal" tabIndex="-1" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">PRESCRIPTION</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            {!rxItem?.prescription ? (
+                                <div className="text-muted">No prescription on this item.</div>
+                            ) : (
+                                <>
+                                    <div className="table-responsive mb-4">
+                                        <table className="table align-middle">
+                                            <thead>
+                                                <tr className="text-muted">
+                                                    <th style={{ width: '20%' }}></th>
+                                                    <th>SPH</th>
+                                                    <th>CYL</th>
+                                                    <th>Axis</th>
+                                                    <th>Add</th>
+                                                    <th>PD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {(() => {
+                                                    const p = rxItem.prescription
+                                                    const singlePD = !p?.prescription?.hasTwoPD
+                                                    const pdRight = singlePD ? (p?.prescription?.pd ?? '') : (p?.prescription?.pd?.right ?? '')
+                                                    const pdLeft = singlePD ? '' : (p?.prescription?.pd?.left ?? '')
+                                                    const od = p?.prescription?.od || {}
+                                                    const os = p?.prescription?.os || {}
+                                                    const fmtNum = (v, sign = true) => typeof v === 'number' ? `${v >= 0 && sign ? '+' : ''}${v.toFixed(2)}` : 'None'
+                                                    const fmtAxis = (v) => typeof v === 'number' ? `${v}` : 'None'
+                                                    return (
+                                                        <>
+                                                            <tr>
+                                                                <th className="text-muted">OD-Right</th>
+                                                                <td>{fmtNum(od.sph)}</td>
+                                                                <td>{fmtNum(od.cyl)}</td>
+                                                                <td>{fmtAxis(od.axis)}</td>
+                                                                <td>{fmtNum(od.add)}</td>
+                                                                {singlePD ? (
+                                                                    <td rowSpan="2" className="align-middle text-center">{pdRight}</td>
+                                                                ) : (
+                                                                    <td>{pdRight}</td>
+                                                                )}
+                                                            </tr>
+                                                            <tr>
+                                                                <th className="text-muted">OS-Left</th>
+                                                                <td>{fmtNum(os.sph)}</td>
+                                                                <td>{fmtNum(os.cyl)}</td>
+                                                                <td>{fmtAxis(os.axis)}</td>
+                                                                <td>{fmtNum(os.add)}</td>
+                                                                {!singlePD && <td>{pdLeft}</td>}
+                                                            </tr>
+                                                        </>
+                                                    )
+                                                })()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div className="list-group">
+                                        <div className="list-group-item d-flex justify-content-between">
+                                            <span className="text-muted">Rx Type</span>
+                                            <span>{RX_LABEL[rxItem?.prescription?.rxType] || '—'}</span>
+                                        </div>
+                                        <div className="list-group-item d-flex justify-content-between">
+                                            <span className="text-muted">Lens Type</span>
+                                            <span>{LT_LABEL[rxItem?.prescription?.lensType] || '—'}</span>
+                                        </div>
+                                        <div className="list-group-item d-flex justify-content-between">
+                                            <span className="text-muted">Lenses</span>
+                                            <span>
+                                                {rxItem?.prescription?.lens
+                                                    ? `${rxItem.prescription.lens.thickness ?? ''} ${String(rxItem.prescription.lens.title || '').toUpperCase()}${rxItem.prescription.lens.price ? ` + $${Number(rxItem.prescription.lens.price).toFixed(2)}` : ''}`.trim()
+                                                    : 'None'}
+                                            </span>
+                                        </div>
+                                        <div className="list-group-item d-flex justify-content-between">
+                                            <span className="text-muted">Coating</span>
+                                            <span>{rxItem?.prescription?.coating?.title?.toUpperCase?.() || 'None'}</span>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
