@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroSlider from '../components/ui/HeroSlider';
@@ -18,14 +18,16 @@ import { Link } from 'react-router-dom';
 import AppContext from '../components/context/appContext';
 import TrackOrder from '../components/TrackOrder';
 const Home = () => {
-    const { products } = useContext(AppContext)
+    const { products, setGlobalLoader } = useContext(AppContext)
+    useEffect(() => { setGlobalLoader(true); return () => setGlobalLoader(false) }, [])
     return (
         <>
             <Header />
             <main>
-                <CategorySlider direction={'left'} />
+                {/* <CategorySlider direction={'left'} /> */}
+                <div className="pt-4">
                 <HeroSlider slides={heroSlides} />
-
+                </div>
 
                 <FeatureIconsRow />
                 <Trust />
@@ -36,7 +38,7 @@ const Home = () => {
                 <section className="top-bg py-5 my-5">
 
                     <p data-aos="fade-up" data-aos-duration="1000" className="display-4 text-center mb-5" style={{ fontWeight: 900 }}>BEST SELLERS </p>
-                    <FeaturedProducts slides={featuredSlides} />
+                    <FeaturedProducts slides={featuredSlides} onLoaded={() => setGlobalLoader(false)} />
 
                 </section>
                 <ShopByPrice />

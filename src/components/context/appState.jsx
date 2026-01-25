@@ -5,6 +5,7 @@ import useLocalStorage from '../useLocalStorage'
 import { toast } from 'react-toastify'
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
+// const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 const LOREM = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, debitis. Reprehenderit, illum. Vitae, minus. Nulla laboriosam, dolorum possimus, reiciendis dignissimos aut eaque nihil, consequuntur fuga laudantium repellendus. Aliquid, laborum facilis.</p>'
@@ -103,6 +104,7 @@ const AppState = (props) => {
   const [basicInfo, setBasicInfo] = useState(null)
   const [categories, setCategories] = useState([])
   const [lenses, setLenses] = useState([])
+  const [globalLoader, setGlobalLoader] = useState(false)
 
   // helper to extract validator / server errors nicely
   const extractError = async (res, fallback = 'Request failed') => {
@@ -145,7 +147,7 @@ const AppState = (props) => {
         },
       ])
     }
-    openCart()
+          openCart()
   }
 
   // Add product with prescription, lens and coating
@@ -351,6 +353,16 @@ const AppState = (props) => {
     const data = await res.json()
     return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
             }
+  const fetchProductsByCategorySlug = async (slug) => {
+    const res = await fetch(`${API_BASE}/api/products/bycategoryslug/${slug}`)
+    const data = await res.json()
+    return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
+  }
+  const fetchHomePreviewProducts = async () => {
+    const res = await fetch(`${API_BASE}/api/products/homepreview`)
+    const data = await res.json()
+    return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
+  }
   const createProductBE = async (payload) => {
     const res = await fetch(`${API_BASE}/api/products/createproduct`, {
       method: 'POST',
@@ -400,6 +412,11 @@ const AppState = (props) => {
   }
   const fetchCategoryById = async (id) => {
     const res = await fetch(`${API_BASE}/api/getdata/getcategory/${id}`)
+    if (!res.ok) throw new Error('Fetch category failed')
+    return await res.json()
+  }
+  const fetchCategoryBySlug = async (slug) => {
+    const res = await fetch(`${API_BASE}/api/getdata/getcategory/slug/${slug}`)
     if (!res.ok) throw new Error('Fetch category failed')
     return await res.json()
   }
@@ -570,7 +587,7 @@ const AppState = (props) => {
   }
 
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, fetchOrders, updateOrderStatus, fetchOrderByTracking }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, fetchOrders, updateOrderStatus, fetchOrderByTracking, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )

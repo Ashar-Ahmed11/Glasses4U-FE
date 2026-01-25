@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import '../CuratedStyleHero.css';
 
 const CategoryCarousel = ({ imageUrl, heading }) => {
   const displayHeading = useMemo(() => {
@@ -17,7 +18,25 @@ const CategoryCarousel = ({ imageUrl, heading }) => {
             <img src={imageUrl} alt={displayHeading} className="position-absolute top-0 start-0 w-100 h-100" style={{ objectFit: 'cover' }} />
           </div>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }}>
-            <p data-aos="fade-up" data-aos-duration="1000" style={{ fontFamily: 'Sagrantino', fontSize: window.innerWidth > 750 ? 52.8 : 32, color: '#000', margin: 0 }}>{displayHeading}</p>
+            <div className="text-center">
+              <p
+                data-aos="fade-up"
+                data-aos-duration="1000"
+                className="title"
+                style={{ color: '#fff', margin: 0, fontSize: window.innerWidth > 750 ? 52.8 : 32, textTransform: 'uppercase' }}
+              >
+                {displayHeading}
+              </p>
+              <div className="mt-3">
+                <a
+                  href="/"
+                  className="shop-btn"
+                  style={{ background: 'transparent', color: '#fff', border: '2px solid #fff' }}
+                >
+                  Shop
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

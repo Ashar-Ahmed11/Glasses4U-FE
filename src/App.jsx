@@ -14,6 +14,10 @@ import TrackOrder from './components/TrackOrder';
 import UserLogin from './components/user/Login';
 import UserRegister from './components/user/Register';
 import UserDashboard from './components/user/Dashboard';
+import Contact from './pages/Contact';
+import About from './pages/About';
+import Terms from './pages/Terms';
+import BigLoader from './components/ui/BigLoader';
 const Success = () => {
   const tracking = localStorage.getItem('lastTrackingId') || ''
   return (
@@ -37,21 +41,24 @@ function App() {
 
       <Switch>
         <Route path="/" exact><Home /></Route>
-        <Route path="/category/:id" exact><Category /></Route>
+        <Route path="/category/:slug" exact><Category /></Route>
         <Route path="/product/:productid" exact ><ProductView /></Route>
         <Route path="/checkout" exact><Checkout /></Route>
         <Route path="/track" exact><TrackOrder /></Route>
-        <Route path="/login" exact><UserLogin /></Route>
-        <Route path="/register" exact><UserRegister /></Route>
+        <Route path="/login" exact render={() => localStorage.getItem('user-token') ? <Redirect to="/account" /> : <UserLogin />} />
+        <Route path="/register" exact render={() => localStorage.getItem('user-token') ? <Redirect to="/account" /> : <UserRegister />} />
         <Route path="/account" render={() => localStorage.getItem('user-token') ? <UserDashboard /> : <Redirect to="/login" />} />
         <Route path="/success" exact><Success /></Route>
         <Route path="/failed" exact><Failed /></Route>
         <Route path="/admin" exact><Admin /></Route>
         <Route path="/dashboard" render={() => localStorage.getItem('auth-token') ? <Dashboard /> : <Redirect to="/admin" />} />
 
-        <Route path="/about" exact><div className="container py-5"><h1>About</h1></div></Route>
+        <Route path="/about" exact><About /></Route>
+        <Route path="/contact" exact><Contact /></Route>
+        <Route path="/terms" exact><Terms /></Route>
         <Route path="/users" exact><div className="container py-5"><h1>Users</h1></div></Route>
       </Switch>
+      <BigLoader />
     </>
   );
 }

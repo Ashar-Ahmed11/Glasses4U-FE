@@ -49,7 +49,7 @@ export default function CreateCategory() {
                 <div className="container">
                     <form>
 
-                        <input value={form.mainHeading} onChange={(e) => {setForm({ ...form, mainHeading: e.target.value })}}  type="text" placeholder='Category Name' className="form-control my-2" />
+                        <input value={form.mainHeading} onChange={(e) => {setForm({ ...form, mainHeading: e.target.value })}}  type="text" placeholder='Category Name' className="form-control my-2" disabled={!!catid} />
                         <div className="my-2">
                             <label className="form-label">Cover Image</label>
                             <br />

@@ -112,3 +112,23 @@
   .hero-slider .col-lg-4.d-flex.flex-column { height: 100%; }
   .hero-slider .col-lg-4.d-flex.flex-column > .position-relative.h-100 { flex: 1 1 0; min-height: 0; }
 }
+
+/* Navbar dropdown overlay: prevent navbar height shift */
+.navbar .nav-item.dropdown { position: relative; }
+.navbar .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  z-index: 1055;
+}
+
+/* Mobile navbar equal layout */
+.mobile-nav { height: 56px; }
+.mobile-nav .btn-icon {
+  width: 44px; height: 44px; border: 0; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+}
+.mobile-nav .fa { font-size: 22px; color: #000; }
+.mobile-nav .nav-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }

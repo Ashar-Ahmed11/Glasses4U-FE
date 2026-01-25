@@ -7,8 +7,8 @@ import ProductCard from '../components/ui/productCard';
 import CategoryCarousel from '../components/ui/CategoryCarousel';
 
 const Category = () => {
-  const { id } = useParams()
-  const { fetchCategoryById, fetchProductsByCategoryId } = useContext(AppContext)
+  const { slug } = useParams()
+  const { fetchCategoryBySlug, fetchProductsByCategorySlug, setGlobalLoader } = useContext(AppContext)
   const [category, setCategory] = useState(null)
   const [loading, setLoading] = useState(true)
   const [catProducts, setCatProducts] = useState([])
@@ -17,21 +17,21 @@ const Category = () => {
     let mounted = true
     ;(async () => {
       try {
-        const cat = await fetchCategoryById(id)
-        const prods = await fetchProductsByCategoryId(id)
+        setGlobalLoader(true)
+        const cat = await fetchCategoryBySlug(slug)
+        const prods = await fetchProductsByCategorySlug(slug)
         if (!mounted) return
         setCategory(cat)
         setCatProducts(prods || [])
       } finally {
         if (mounted) setLoading(false)
+        setGlobalLoader(false)
       }
     })()
     return () => { mounted = false }
-  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [slug]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) {
-    return <div className="container py-5 text-center"><div className="spinner-border text-dark" role="status"><span className="visually-hidden">Loading...</span></div></div>
-  }
+  // BigLoader handles the initial loading UI; no local spinner needed.
 
   return (
     <>
@@ -42,14 +42,14 @@ const Category = () => {
 
         {/* Headings (basic) */}
         <div className="container my-4">
-          <h2 className="text-center fw-bold mb-3">{category?.mainHeading}</h2>
+          {/* <h2 className="text-center fw-bold mb-3">{category?.mainHeading}</h2> */}
         </div>
 
         {/* Products grid */}
         <section className="container my-4">
-          <div className="row">
+          <div className="row justify-content-center">
             {catProducts.map((p) => (
-              <div className="col-6 col-md-4 col-lg-3 mb-4" key={p._id}>
+              <div className="col-12 col-md-4 col-lg-3 mb-4" key={p._id}>
                 <ProductCard product={p} to={`/product/${p._id}`} />
               </div>
             ))}

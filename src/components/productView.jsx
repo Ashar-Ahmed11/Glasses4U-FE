@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
@@ -10,12 +10,13 @@ import ResizePlugin from './resizePlugin'
 import MutationPlugin from './mutationPlugin'
 import ThumbnailPlugin from './thumbnailPlugin'
 import PrescriptionModal from './prescriptionModal'
+import { toast } from 'react-toastify'
 
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 export default function ProductView() {
   const { productid } = useParams()
-  const { addProductWithPrescription, fetchSingleProductBE } = useContext(AppContext)
+  const { addProductWithPrescription, fetchSingleProductBE, addToWishlist, userToken, basicInfo, getBasicInfo, setGlobalLoader } = useContext(AppContext)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -23,6 +24,7 @@ export default function ProductView() {
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState(null)
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [wishLoading, setWishLoading] = useState(false)
 
   const [sliderRef, instanceRef] = useKeenSlider({ initial: 0 }, [ResizePlugin])
   const [thumbnailRef] = useKeenSlider({
@@ -32,21 +34,24 @@ export default function ProductView() {
 
   useEffect(() => {
     let mounted = true
-    ;(async () => {
-      try {
-        setLoading(true); setError(''); setImgLoaded(false)
-        const data = await fetchSingleProductBE(productid)
-        if (!mounted) return
-        setProduct(data || null)
-        if (data?.variants?.length) setSelectedSize(data.variants[0])
-      } catch (e) {
-        if (mounted) setError('Failed to load product')
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    })()
+      ; (async () => {
+        try {
+          setLoading(true); setError(''); setImgLoaded(false)
+          setGlobalLoader(true)
+          const data = await fetchSingleProductBE(productid)
+          if (!mounted) return
+          setProduct(data || null)
+          if (data?.variants?.length) setSelectedSize(data.variants[0])
+        } catch (e) {
+          if (mounted) setError('Failed to load product')
+        } finally {
+          if (mounted) setLoading(false)
+          setGlobalLoader(false)
+        }
+      })()
     return () => { mounted = false }
   }, [productid]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!basicInfo) getBasicInfo() }, []) // load shipping info
 
   if (loading) return (<><Header /><div className="container py-5">Loading...</div><Footer /></>)
   if (error || !product) return (<><Header /><div className="container py-5">Product not found.</div><Footer /></>)
@@ -54,6 +59,7 @@ export default function ProductView() {
   const color = '#212427'
   const unitPrice = selectedSize ? selectedSize.price : product.price
   const fs = product?.frameSpecs || {}
+  const eta = new Date(Date.now() + 5 * 864e5).toLocaleDateString()
   const specRows = [
     { label: 'Lens Width', value: fs.lensWidth ? `${fs.lensWidth} mm` : '' },
     { label: 'Nose Bridge', value: fs.noseBridge ? `${fs.noseBridge} mm` : '' },
@@ -109,14 +115,78 @@ export default function ProductView() {
             )}
 
             <div className="d-flex align-items-center my-3">
-              <button className="btn btn-outline-dark" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+              <button
+                className="btn top-bg text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36 }}
+                aria-label="Decrease quantity"
+                onClick={() => setQuantity(q => Math.max(1, q - 1))}
+              >
+                −
+              </button>
               <span className="mx-3 h5 mb-0" style={{ color }}>{quantity}</span>
-              <button className="btn btn-outline-dark" onClick={() => setQuantity(q => q + 1)}>+</button>
+              <button
+                className="btn top-bg text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36 }}
+                aria-label="Increase quantity"
+                onClick={() => setQuantity(q => q + 1)}
+              >
+                +
+              </button>
             </div>
 
-            <button className="btn top-bg text-white rounded-pill px-3 py-2 border-2 border-light" data-bs-toggle="modal" data-bs-target="#exampleModal">Add to cart</button>
-        
-            <PrescriptionModal onComplete={(payload) => addProductWithPrescription(product, quantity, selectedSize, payload)}/>
+            <div className="d-flex gap-2">
+              <button className="btn top-bg text-white rounded-pill px-3 py-2 border-2 border-light" data-bs-toggle="modal" data-bs-target="#exampleModal">Add to cart</button>
+              <button
+                className="btn btn-outline-dark rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2"
+                disabled={wishLoading}
+                onClick={async () => {
+                  try {
+                    if (!userToken) { toast.error('The User is not logged in.'); return }
+                    setWishLoading(true)
+                    await addToWishlist(product._id)
+                    toast.success('The item is successfully added to wishlist')
+                  } catch (e) {
+                    toast.error(e.message || 'Failed to add to wishlist')
+                  } finally {
+                    setWishLoading(false)
+                  }
+                }}
+              >
+                {wishLoading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
+                {wishLoading ? 'Adding...' : 'Add to wishlist'}
+              </button>
+            </div>
+
+            {/* Meta info block */}
+            <div className="mt-3 py-3 px-2 px-md-3">
+              <div className="d-flex align-items-center gap-3 mb-2">
+                <span className="badge bg-success px-3 py-2 fs-6">In Stock</span>
+                {/* <div className="fs-6">
+                  <span className="text-warning me-2"><i className="fa fa-star" /></span>
+                  <span className="fw-semibold" style={{ color }}>4.7</span>
+                  <span className="text-muted"> (1,248)</span>
+                </div> */}
+                <div className="fs-6">
+                <span className="text-warning me-2"><i className="fa fa-star" /></span>
+                <span className="text-warning me-2"><i className="fa fa-star" /></span>
+                <span className="text-warning me-2"><i className="fa fa-star" /></span>
+
+                  {/* <span className="fw-semibold text-dark"></span> */}
+                  <small className="text-muted">Top Rated</small>
+                </div>
+              </div>
+              <div className="text-muted mt-2 fs-6 d-flex align-items-center">
+                <i className="fa fa-truck fa-lg me-2" />
+                Estimated delivery: {eta} · Shipping {priceConverter(Number(basicInfo?.deliveryCharges || 0))}
+              </div>
+              <div className="d-flex flex-wrap gap-4 text-muted mt-3 fs-6">
+                <span className="d-inline-flex align-items-center"><i className="fa fa-check-circle fa-lg me-2" />1-year warranty</span>
+                <span className="d-inline-flex align-items-center"><i className="fa fa-undo fa-lg me-2" />14-day returns</span>
+                <span className="d-inline-flex align-items-center"><i className="fa fa-lock fa-lg me-2" />Secure checkout</span>
+              </div>
+            </div>
+
+            <PrescriptionModal onComplete={(payload) => addProductWithPrescription(product, quantity, selectedSize, payload)} />
           </div>
         </div>
       </div>

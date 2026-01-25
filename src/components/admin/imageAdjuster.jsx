@@ -60,18 +60,18 @@ export default function ImageAdjuster({ imageUrl, setEditImageUrl, onUploaded, m
 		}
 	};
 
-	const createCroppedBlob = async () => {
+const createCroppedBlob = async () => {
 		const img = await new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.src = image })
 		const canvas = document.createElement('canvas')
 		canvas.width = croppedArea.width; canvas.height = croppedArea.height
 		const ctx = canvas.getContext('2d')
 		ctx.drawImage(img, croppedArea.x, croppedArea.y, croppedArea.width, croppedArea.height, 0, 0, croppedArea.width, croppedArea.height)
-		return await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.9))
+		return await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'))
 	}
 
-	const onUpload = async () => {
+const onUpload = async () => {
 		const blob = await createCroppedBlob()
-		const file = new File([blob], `crop_${Date.now()}.jpg`, { type: 'image/jpeg' })
+		const file = new File([blob], `crop_${Date.now()}.png`, { type: 'image/png' })
 		const url = await uploadImage(file)
 		onUploaded && onUploaded(url)
 		setEditImageUrl && setEditImageUrl(null)

@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
+import ResizePlugin from '../resizePlugin';
+import MutationPlugin from '../mutationPlugin';
 import AppContext from '../context/appContext';
 import ProductCard from './productCard';
-const FeaturedProducts = () => {
+const FeaturedProducts = ({ onLoaded }) => {
     const [ref] = useKeenSlider({
         
         renderMode: 'auto',
@@ -22,12 +24,20 @@ const FeaturedProducts = () => {
                 slides: { perView: 4.5, spacing: 10, origin: 'auto' }
             }
         }
-    });
-    const { products } = useContext(AppContext)
+    }, [ResizePlugin, MutationPlugin]);
+    const { fetchHomePreviewProducts } = useContext(AppContext)
+    const [items, setItems] = useState([])
+    useEffect(() => { (async () => {
+        try {
+            const list = await fetchHomePreviewProducts(); setItems(list || [])
+        } finally {
+            onLoaded && onLoaded()
+        }
+    })() }, [])
     return (
         <>
             <div ref={ref} className="keen-slider px-4">
-                {products.map((p) => (
+                {items.map((p) => (
                     <div className="keen-slider__slide" key={p._id}>
                         <ProductCard product={p} to={`/product/${p._id}`} />
                     </div>

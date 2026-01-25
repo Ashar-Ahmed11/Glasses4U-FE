@@ -146,10 +146,8 @@ export default function CreateProduct() {
 
     const deleteModalRef = useRef(null)
 
-    const removeImage = (element) => {
-        const filteredImages = imgPreview.filter((e) => { return e._id !== element._id })
-        setImgPreview(filteredImages)
-
+    const removeImage = (index) => {
+        setImgPreview(imgPreview.filter((_, i) => i !== index))
     }
     console.log(components, imgPreview)
 
@@ -206,7 +204,7 @@ export default function CreateProduct() {
                                             className="col-md-4 col-lg-3 col-6 p-1"><div class="card" style={{}}>
                                                 <img onClick={() => { /* no-op */ }} src={e.url || e} class="card-img-top " alt="..." />
                                                 <span style={{ backgroundColor: '#000000', width: '30px', height: '30px', border: '1px solid #F4B92D', color: '#F4B92D' }} class="position-absolute top-0 start-100 translate-middle rounded-circle">
-                                                    <p onClick={() => removeImage(e)} style={{ paddingTop: '2px', cursor: 'pointer' }} className='text-center'><i class="fas fa-times fa-lg"></i></p>
+                                                    <p onClick={() => removeImage(i)} style={{ paddingTop: '2px', cursor: 'pointer' }} className='text-center'><i class="fas fa-times fa-lg"></i></p>
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
                                             </div>
