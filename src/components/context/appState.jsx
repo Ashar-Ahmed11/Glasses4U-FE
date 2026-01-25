@@ -4,8 +4,8 @@ import { useState } from 'react'
 import useLocalStorage from '../useLocalStorage'
 import { toast } from 'react-toastify'
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
-// const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
+// const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 const LOREM = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, debitis. Reprehenderit, illum. Vitae, minus. Nulla laboriosam, dolorum possimus, reiciendis dignissimos aut eaque nihil, consequuntur fuga laudantium repellendus. Aliquid, laborum facilis.</p>'
