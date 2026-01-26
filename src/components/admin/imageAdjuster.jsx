@@ -42,6 +42,7 @@ export default function ImageAdjuster({ imageUrl, setEditImageUrl, onUploaded, m
 	
 	const [crop, setCrop] = React.useState({ x: 0, y: 0 });
 	const [zoom, setZoom] = React.useState(1);
+	const [uploading, setUploading] = React.useState(false);
 
 	const onCropComplete = (croppedAreaPercentage, croppedAreaPixels) => {
 		setCroppedArea(croppedAreaPixels);
@@ -70,12 +71,17 @@ const createCroppedBlob = async () => {
 	}
 
 const onUpload = async () => {
-		const blob = await createCroppedBlob()
-		const file = new File([blob], `crop_${Date.now()}.png`, { type: 'image/png' })
-		const url = await uploadImage(file)
-		onUploaded && onUploaded(url)
-		setEditImageUrl && setEditImageUrl(null)
-		setImage(null); setZoom(1); setCrop({ x: 0, y: 0 }); setCroppedArea(null)
+		try {
+			setUploading(true)
+			const blob = await createCroppedBlob()
+			const file = new File([blob], `crop_${Date.now()}.png`, { type: 'image/png' })
+			const url = await uploadImage(file)
+			onUploaded && onUploaded(url)
+			setEditImageUrl && setEditImageUrl(null)
+			setImage(null); setZoom(1); setCrop({ x: 0, y: 0 }); setCroppedArea(null)
+		} finally {
+			setUploading(false)
+		}
 	}
 
     // Reset state when Bootstrap modal closes
@@ -136,7 +142,10 @@ const onUpload = async () => {
 					style={{ display: "none" }}
 				/>
 				<button type="button" className="btn btn-primary" onClick={triggerFileSelectPopup}>Choose</button>
-				<button type="button" className="btn btn-secondary" onClick={onUpload} disabled={!image}>Upload</button>
+				<button type="button" className="btn btn-secondary" onClick={onUpload} disabled={!image || uploading}>
+					{uploading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
+					{uploading ? 'Uploading...' : 'Upload'}
+				</button>
 			</div>
 		</div>
 	);

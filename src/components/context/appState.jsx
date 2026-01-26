@@ -496,14 +496,18 @@ const AppState = (props) => {
       }
   }
 
-  // Upload (Cloudinary via backend)
+  // Upload (direct to Cloudinary)
   const uploadImage = async (file) => {
     const fd = new FormData()
-    fd.append('photo', file)
-    const res = await fetch(`${API_BASE}/api/sendImg`, { method: 'POST', body: fd })
+    fd.append('file', file)
+    fd.append('upload_preset', 'dga8po59')
+    const res = await fetch('https://api.cloudinary.com/v1_1/dextrzp2q/image/upload', {
+      method: 'POST',
+      body: fd,
+    })
     if (!res.ok) throw new Error('Upload failed')
     const data = await res.json()
-    return data.url
+    return data.secure_url || data.url
   }
 
   // Lenses
