@@ -7,6 +7,18 @@ const Header = () => {
   const { categories, fetchCategories, userToken } = useContext(AppContext)
   useEffect(() => { fetchCategories() }, [])
 
+  const closeMobileOffcanvas = () => {
+    const el = document.getElementById('mobileMenu')
+    if (!el) return
+    try {
+      const api = window.bootstrap?.Offcanvas?.getOrCreateInstance
+        ? window.bootstrap.Offcanvas.getOrCreateInstance(el)
+        : null
+      if (api) api.hide()
+      else el.classList.remove('show')
+    } catch (e) {}
+  }
+
   return (
     <header className="sticky-top  shadow-sm top-bg">
       {/* Mobile navbar */}
@@ -60,19 +72,19 @@ const Header = () => {
           <ul className="navbar-nav">
             {(categories || []).map((c, idx) => (
               <li className="nav-item" key={idx}>
-                <Link className="nav-link fs-4 text-dark" to={`/category/${(c.mainHeading || '').toLowerCase().replace(/[\s\-_\/]+/g,'-').replace(/[^a-z0-9-]/g,'')}`} data-bs-dismiss="offcanvas">
+                <Link className="nav-link fs-4 text-dark" to={`/category/${(c.mainHeading || '').toLowerCase().replace(/[\s\-_\/]+/g,'-').replace(/[^a-z0-9-]/g,'')}`} onClick={closeMobileOffcanvas}>
                   {c.mainHeading}
                 </Link>
               </li>
             ))}
             <li className="nav-item">
-              <Link className="nav-link fs-4 text-dark" to="/contact" data-bs-dismiss="offcanvas">Contact Us</Link>
+              <Link className="nav-link fs-4 text-dark" to="/contact" onClick={closeMobileOffcanvas}>Contact Us</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link fs-4 text-dark" to="/about" data-bs-dismiss="offcanvas">About Us</Link>
+              <Link className="nav-link fs-4 text-dark" to="/about" onClick={closeMobileOffcanvas}>About Us</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link fs-4 text-dark" to="/terms" data-bs-dismiss="offcanvas">Terms &amp; Conditions</Link>
+              <Link className="nav-link fs-4 text-dark" to="/terms" onClick={closeMobileOffcanvas}>Terms &amp; Conditions</Link>
             </li>
           </ul>
           <hr />
