@@ -25,7 +25,7 @@ const payOptions = [
 const PaymentOptions = () => (
   <section className="container py-5">
     <h2 className="display-5 fw-bold text-center mb-2">Payment Options Available</h2>
-    <p className="lead text-center text-muted mb-4">Shop now and pay over time with our flexible payment options.</p>
+    <p className="lead text-center text-muted mb-4"> Shop Eye Glasses Online Today</p>
     <div className="row g-3 g-lg-4">
       {payOptions.map((opt, i) => (
         <div className="col-12 col-lg-4" key={i}>
