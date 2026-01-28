@@ -1,8 +1,16 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import AppContext from '../components/context/appContext'
 
 export default function Contact() {
+  const { basicInfo, getBasicInfo } = useContext(AppContext)
+  useEffect(() => { if (!basicInfo) getBasicInfo() }, [basicInfo, getBasicInfo])
+  const ensureProtocol = (u) => u && /^https?:\/\//i.test(u) ? u : (u ? `https://${String(u).replace(/^\/+/, '')}` : '')
+  const email = basicInfo?.email || 'support@glasses4u.example'
+  const phone = basicInfo?.phoneNumber || '+1 (555) 123‑4567'
+  const fb = ensureProtocol(basicInfo?.facebookProfileLink) || 'https://www.facebook.com/'
+  const ig = ensureProtocol(basicInfo?.instagramProfileLink) || 'https://www.instagram.com/'
   return (
     <>
       <Header />
@@ -30,9 +38,12 @@ export default function Contact() {
             <div className="card border-0 bg-light h-100 p-3">
               <img className="rounded mb-3" alt="support" src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=1200&auto=format&fit=crop" style={{ height: 180, width: '100%', objectFit: 'cover' }} />
               <h5>Customer Support</h5>
-              <p className="mb-1">Email: support@glasses4u.example</p>
-              <p className="mb-1">Phone: +1 (555) 123‑4567</p>
-              <p>Mon–Fri, 9am–6pm</p>
+              <p className="mb-1">Email: {email}</p>
+              <p className="mb-1">Phone: {phone}</p>
+              <div className="d-flex align-items-center gap-3 mt-2">
+                <a className="text-dark" href={ig} target="_blank" rel="noreferrer"><i className="fa fa-instagram" style={{ fontSize: 22 }}></i></a>
+                <a className="text-dark" href={fb} target="_blank" rel="noreferrer"><i className="fa fa-facebook-official" style={{ fontSize: 22 }}></i></a>
+              </div>
             </div>
           </div>
           <div className="col-md-4">

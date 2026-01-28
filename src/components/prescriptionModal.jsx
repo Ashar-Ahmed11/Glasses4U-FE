@@ -30,7 +30,7 @@ const Select = ({ values, value, onChange, sign = false, decimals = 2 }) => (
 )
 
 const PrescriptionModal = ({ onComplete }) => {
-  const { lenses, fetchLenses } = React.useContext(AppContext)
+  const { lenses, fetchLenses, basicInfo, getBasicInfo } = React.useContext(AppContext)
   const INITIAL_FORM = {
     // OD (Right)
     od_sph: -1.0,
@@ -66,14 +66,33 @@ const PrescriptionModal = ({ onComplete }) => {
     setCoating(null)
   }, [])
 
+  const [loading, setLoading] = React.useState(false)
+
+  // Ensure basic info loaded for dynamic coating price
+  React.useEffect(() => {
+    (async () => {
+      if (!basicInfo) {
+        try { setLoading(true); await getBasicInfo() } finally { setLoading(false) }
+      }
+    })()
+  }, [basicInfo, getBasicInfo])
+
   // Fetch lenses for Step 4 based on selections from steps 2 and 3
+  const lastQueryRef = React.useRef('')
   React.useEffect(() => {
     const RX_MAP = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
     const LT_MAP = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun' }
     if (step === 4 && rxType && lensType) {
-      fetchLenses({ rxType: RX_MAP[rxType], lensType: LT_MAP[lensType] })
+      const queryKey = `${rxType}|${lensType}`
+      if (lastQueryRef.current !== queryKey) {
+        lastQueryRef.current = queryKey
+        ;(async () => {
+          try { setLoading(true); await fetchLenses({ rxType: RX_MAP[rxType], lensType: LT_MAP[lensType] }) }
+          finally { setLoading(false) }
+        })()
+      }
     }
-  }, [step, rxType, lensType, fetchLenses])
+  }, [step, rxType, lensType])
 
   // Reset when modal is closed
   React.useEffect(() => {
@@ -122,6 +141,13 @@ const PrescriptionModal = ({ onComplete }) => {
           </div>
 
           <div className="modal-body">
+            {loading && (
+              <div className="text-center my-3">
+                <div className="spinner-border" role="status" style={{ width: 40, height: 40 }}>
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )}
             {step === 1 && (
               <>
                 <h3 className="mb-4">Step 1 - Prescription</h3>
@@ -466,10 +492,14 @@ const PrescriptionModal = ({ onComplete }) => {
               <>
                 <h3 className="mb-1">Step 5 - Coating</h3>
                 <div className="row g-3 mt-2">
-                  {[
-                    { key: 'standard', title: 'STANDARD COATINGS+ $5.95', desc: 'Anti-Reflective, UV and Scratch Resistance' },
-                    { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.' },
-                  ].map((item) => (
+                  {(() => {
+                    const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
+                    const items = [
+                      { key: 'standard', title: `STANDARD COATINGS+ $${standardPrice.toFixed(2)}`, desc: 'Anti-Reflective, UV and Scratch Resistance', price: standardPrice },
+                      { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.', price: 0 },
+                    ]
+                    return items
+                  })().map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
                         type="button"
@@ -495,7 +525,8 @@ const PrescriptionModal = ({ onComplete }) => {
                     className="btn btn-outline-secondary"
                     onClick={() => {
                       const lens = (lenses || []).find((l) => String(l._id) === String(lensOption)) || null
-                      const coatingMap = { standard: { key: 'standard', title: 'Standard Coatings', price: 5.95 }, none: { key: 'none', title: 'No Coatings', price: 0 } }
+                      const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
+                      const coatingMap = { standard: { key: 'standard', title: 'Standard Coatings', price: standardPrice }, none: { key: 'none', title: 'No Coatings', price: 0 } }
                       const payload = {
                         rxType,
                         lensType,

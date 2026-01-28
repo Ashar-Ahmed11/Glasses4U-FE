@@ -567,6 +567,18 @@ const AppState = (props) => {
     }
     return await res.json()
   }
+  // Email
+  const sendOrderEmail = async (payload) => {
+    try {
+      await fetch(`${API_BASE}/api/sendemail`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+    } catch (_) {
+      // non-blocking
+    }
+  }
   const clearCart = () => setCart([])
 
   // Orders (Admin)
@@ -591,7 +603,7 @@ const AppState = (props) => {
   }
 
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, fetchOrders, updateOrderStatus, fetchOrderByTracking, globalLoader, setGlobalLoader }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )

@@ -11,7 +11,7 @@ export default function Checkout() {
 
 
     const history = useHistory()
-    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken } = useContext(AppContext)
+    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken, sendOrderEmail } = useContext(AppContext)
     const [checkoutLoader, setCheckoutLoader] = useState(false)
     const [rxItem, setRxItem] = useState(null)
     const RX_LABEL = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
@@ -241,7 +241,33 @@ export default function Checkout() {
                                                             status: 'Pending Approval',
                                                         }
                                                         toast.success('Payment Successful, Please Wait!')
-                                                        const saved = await createOrder(orderPayload)
+                                                        // fire email in parallel, chained to order result for tracking id
+                                                        const createPromise = createOrder(orderPayload)
+                                                        createPromise.then((saved) => {
+                                                            const emailPayload = {
+                                                                email: form.email,
+                                                                name: `${form.firstname} ${form.lastname}`.trim(),
+                                                                phone: form.phone,
+                                                                address: form.address,
+                                                                city: form.city,
+                                                                country: form.country || '',
+                                                                postalCode: form.postalCode || '',
+                                                                trackingId: saved?.trackingId || '',
+                                                                status: 'Pending Approval',
+                                                                subtotal: Number(totalCal.toFixed(2)),
+                                                                deliveryCharges: Number(delivery),
+                                                                total: Number((totalCal + delivery).toFixed(2)),
+                                                                items: cart.map((it) => ({
+                                                                    name: it.name,
+                                                                    image: it.image,
+                                                                    quantity: it.quantity,
+                                                                    unitPrice: it.price,
+                                                                    prescription: it.prescription || null,
+                                                                })),
+                                                            }
+                                                            sendOrderEmail(emailPayload)
+                                                        })
+                                                        const saved = await createPromise
                                                         if (saved?.trackingId) localStorage.setItem('lastTrackingId', String(saved.trackingId))
                                                         clearCart()
                                                         const el = document.getElementById('paypalModal')

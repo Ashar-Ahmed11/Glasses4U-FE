@@ -177,11 +177,11 @@ export default function ProductView() {
               </div>
               <div className="text-muted mt-2 fs-6 d-flex align-items-center">
                 <i className="fa fa-truck fa-lg me-2" />
-                Estimated delivery: {eta} · Shipping {priceConverter(Number(basicInfo?.deliveryCharges || 0))}
+                Delivery: Full Protection · Shipping {priceConverter(Number(basicInfo?.deliveryCharges || 0))}
               </div>
               <div className="d-flex flex-wrap gap-4 text-muted mt-3 fs-6">
-                <span className="d-inline-flex align-items-center"><i className="fa fa-check-circle fa-lg me-2" />1-year warranty</span>
-                <span className="d-inline-flex align-items-center"><i className="fa fa-undo fa-lg me-2" />14-day returns</span>
+                <span className="d-inline-flex align-items-center"><i className="fa fa-check-circle fa-lg me-2" />Premium Quality</span>
+                <span className="d-inline-flex align-items-center"><i className="fa fa-undo fa-lg me-2" />24/7 Support</span>
                 <span className="d-inline-flex align-items-center"><i className="fa fa-lock fa-lg me-2" />Secure checkout</span>
               </div>
             </div>

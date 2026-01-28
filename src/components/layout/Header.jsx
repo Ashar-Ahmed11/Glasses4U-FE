@@ -4,8 +4,11 @@ import logo from '../logo.png';
 import AppContext from '../context/appContext';
 
 const Header = () => {
-  const { categories, fetchCategories, userToken } = useContext(AppContext)
-  useEffect(() => { fetchCategories() }, [])
+  const { categories, fetchCategories, userToken, basicInfo, getBasicInfo } = useContext(AppContext)
+  useEffect(() => { fetchCategories(); getBasicInfo() }, [])
+  const ensureProtocol = (u) => u && /^https?:\/\//i.test(u) ? u : (u ? `https://${String(u).replace(/^\/+/, '')}` : '')
+  const fb = ensureProtocol(basicInfo?.facebookProfileLink) || 'https://www.facebook.com/'
+  const ig = ensureProtocol(basicInfo?.instagramProfileLink) || 'https://www.instagram.com/'
 
   const closeMobileOffcanvas = () => {
     const el = document.getElementById('mobileMenu')
@@ -89,8 +92,8 @@ const Header = () => {
           </ul>
           <hr />
           <ul className="navbar-nav flex-row gap-3">
-            <li className="nav-item"><a className="nav-link text-dark" href="https://www.instagram.com/" target="_blank" rel="noreferrer"><i className="fa fa-instagram" style={{ fontSize: 22, color: '#000' }}></i></a></li>
-            <li className="nav-item"><a className="nav-link text-dark" href="https://www.facebook.com/" target="_blank" rel="noreferrer"><i className="fa fa-facebook-official" style={{ fontSize: 22, color: '#000' }}></i></a></li>
+            <li className="nav-item"><a className="nav-link text-dark" href={ig} target="_blank" rel="noreferrer"><i className="fa fa-instagram" style={{ fontSize: 22, color: '#000' }}></i></a></li>
+            <li className="nav-item"><a className="nav-link text-dark" href={fb} target="_blank" rel="noreferrer"><i className="fa fa-facebook-official" style={{ fontSize: 22, color: '#000' }}></i></a></li>
             {/* <li className="nav-item"><a className="nav-link text-dark" href="/"><i className="fa fa-map-marker" style={{ fontSize: 22, color: '#000' }}></i></a></li> */}
           </ul>
         </div>
@@ -100,8 +103,8 @@ const Header = () => {
       <nav className="navbar d-none d-lg-flex top-bg">
         <div className="container-fluid align-items-center justify-content-between">
           <ul className="navbar-nav flex-row">
-            <li className="nav-item me-3"><a className="nav-link text-dark" href="https://www.instagram.com/" target="_blank" rel="noreferrer"><i className="fa fa-instagram" style={{ fontSize: 22, color: '#000' }}></i></a></li>
-            <li className="nav-item me-3"><a className="nav-link text-dark" href="https://www.facebook.com/" target="_blank" rel="noreferrer"><i className="fa fa-facebook-official" style={{ fontSize: 22, color: '#000' }}></i></a></li>
+            <li className="nav-item me-3"><a className="nav-link text-dark" href={ig} target="_blank" rel="noreferrer"><i className="fa fa-instagram" style={{ fontSize: 22, color: '#000' }}></i></a></li>
+            <li className="nav-item me-3"><a className="nav-link text-dark" href={fb} target="_blank" rel="noreferrer"><i className="fa fa-facebook-official" style={{ fontSize: 22, color: '#000' }}></i></a></li>
           </ul>
           <Link className="navbar-brand text-dark" to="/" style={{ transform: 'scale(1.2)' }}>
             <img src={logo} style={{ scale: 1.5 }} alt="Logo" width="40" height="40" className="d-inline-block align-text-top" />
