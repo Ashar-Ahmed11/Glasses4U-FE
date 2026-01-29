@@ -11,7 +11,7 @@ const SecHero = () => {
                     CURATED <br /> STYLE EDIT
                 </h1>
                 <p className="subtitle">
-                    The trend shop everyone’s eying—and loving.
+                    Discover our selection of stylish frames curated for fashion, comfort, and everyday wear.
                 </p>
                 <button className="shop-btn">Shop now</button>
             </div>

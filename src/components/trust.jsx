@@ -5,7 +5,7 @@ const Trust = () => {
 
   return (
     <div className="container pb-5">
-       <p data-aos="fade-up" data-aos-duration="1000" className="display-4 text-center my-5" style={{ color: color,fontWeight:900 }}>SMARTER DEFENSE STARTS HERE       </p>
+       <p data-aos="fade-up" data-aos-duration="1000" className="display-4 text-center my-5" style={{ color: color,fontWeight:900 }}>SMARTER DEFENSE STARTS HERE</p>
 
 
       <div className="row g-4">
@@ -16,7 +16,7 @@ const Trust = () => {
               WIDE RANGE OF PRODUCTS
             </h5>
             <p className="text-secondary">
-         Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
+         From everyday prescription glasses to trendy sunglasses and blue-light lenses, find the perfect pair for every look and lifestyle.
             </p>
           </div>
         </div>
@@ -28,7 +28,8 @@ const Trust = () => {
               BEST PRICES & GREAT DEALS
             </h5>
             <p className="text-secondary">
-             Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
+             Get premium eyewear at unbeatable prices with daily deals, seasonal discounts, and bundle offers that help you save more on every pair.
+
             </p>
           </div>
         </div>
@@ -40,7 +41,7 @@ const Trust = () => {
               DELIVERY ALL OVER USA
             </h5>
             <p className="text-secondary">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
+            Fast and reliable shipping to all 50 states, so you can enjoy clear vision delivered straight to your door.
             </p>
           </div>
         </div>
@@ -52,7 +53,7 @@ const Trust = () => {
               ECO FRIENDLY
             </h5>
             <p className="text-secondary">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti, deserunt?
+              Choose eco-friendly eyewear solutions with responsible materials and greener packaging for a better tomorrow.
             </p>
           </div>
         </div>

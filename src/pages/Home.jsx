@@ -32,6 +32,7 @@ const Home = () => {
                 <FeatureIconsRow />
                 <Trust />
                 <p data-aos="fade-up" data-aos-duration="1000" className="display-4 text-center mb-5" style={{ fontWeight: 900 }}>EYEWEAR FOR EVERYONE         </p>
+                {/* <p data-aos="fade-up" data-aos-duration="1000" className="text-center mb-5" style={{ fontWeight: 900 }}>From trendy frames to classic styles, we offer eyewear that fits every age, style, and vision need.       </p> */}
 
                 <FeaturedEyewear slides={featuredSlides} />
 
