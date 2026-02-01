@@ -1,16 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AppContext from '../context/appContext';
 
 const Footer = () => {
-  const { categories = [] } = useContext(AppContext)
+  const { categories = [], basicInfo, getBasicInfo } = useContext(AppContext)
+  useEffect(() => { if (!basicInfo) getBasicInfo() }, [basicInfo, getBasicInfo])
   return (
     <footer className="bg-light border-top mt-5 py-5">
       <div className="container">
         <div className="row g-4 px-4">
           <div className="col-12 col-md">
             <div className="fw-bold">Glasses 4U</div>
-            <small className="text-muted">Eyewear for everyone®</small>
+            {basicInfo?.footerDescription
+              ? <small className="text-muted d-block" style={{ whiteSpace: 'pre-wrap' }}>{basicInfo.footerDescription}</small>
+              : <small className="text-muted">Eyewear for everyone®</small>}
           </div>
           <div className="col-6 col-md">
             <div className="fw-semibold mb-2">Shop</div>

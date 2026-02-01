@@ -7,6 +7,28 @@ import AppContext from './context/appContext'
 // import { PayPalButton } from 'react-paypal-button-v2'
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { useHistory } from 'react-router-dom'
+const COUNTRIES = [
+    'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria',
+    'Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan',
+    'Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia',
+    'Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (Congo-Brazzaville)','Costa Rica',
+    'Cote d’Ivoire','Croatia','Cuba','Cyprus','Czechia','Democratic Republic of the Congo','Denmark','Djibouti','Dominica','Dominican Republic',
+    'Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland',
+    'France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea',
+    'Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq',
+    'Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait',
+    'Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg',
+    'Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico',
+    'Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru',
+    'Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman',
+    'Pakistan','Palau','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar',
+    'Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia',
+    'Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa',
+    'South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan',
+    'Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan',
+    'Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City',
+    'Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'
+]
 export default function Checkout() {
 
 
@@ -71,7 +93,7 @@ export default function Checkout() {
 
 
     const paypalAmount = total.toFixed(2)
-    const isFormValid = [form.firstname, form.lastname, form.email, form.phone, form.address, form.city].every((v) => String(v || '').trim() !== '')
+    const isFormValid = [form.firstname, form.lastname, form.email, form.phone, form.address, form.city, form.country].every((v) => String(v || '').trim() !== '')
     const openPayPal = () => {
         if (!isFormValid) return
         const el = document.getElementById('paypalModal')
@@ -143,7 +165,10 @@ export default function Checkout() {
                             <p className='my-2' style={{ fontSize: '25px', color: color }} >Shipping address</p>
 
 
-                            <input required value={form.country || ''} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder='Country/Region' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control" />
+                            <select required value={form.country || ''} onChange={(e) => setForm({ ...form, country: e.target.value })} class="form-select" style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }}>
+                                <option value="" disabled>Select Country</option>
+                                {COUNTRIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                            </select>
 
                             <div className="d-flex justify-content-between my-4">
                                 <input required value={form.firstname} onChange={(e) => setForm({ ...form, firstname: e.target.value })} placeholder='First Name' style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }} type="text" class="form-control mx-1" />
@@ -266,6 +291,29 @@ export default function Checkout() {
                                                                 })),
                                                             }
                                                             sendOrderEmail(emailPayload)
+                                                            const adminEmailPayload = {
+                                                                email: "kashanshahbaz7@gmail.com",
+                                                                customerEmail: form.email,
+                                                                name: `${form.firstname} ${form.lastname}`.trim(),
+                                                                phone: form.phone,
+                                                                address: form.address,
+                                                                city: form.city,
+                                                                country: form.country || '',
+                                                                postalCode: form.postalCode || '',
+                                                                trackingId: saved?.trackingId || '',
+                                                                status: 'Pending Approval',
+                                                                subtotal: Number(totalCal.toFixed(2)),
+                                                                deliveryCharges: Number(delivery),
+                                                                total: Number((totalCal + delivery).toFixed(2)),
+                                                                items: cart.map((it) => ({
+                                                                    name: it.name,
+                                                                    image: it.image,
+                                                                    quantity: it.quantity,
+                                                                    unitPrice: it.price,
+                                                                    prescription: it.prescription || null,
+                                                                })),
+                                                            }
+                                                            sendOrderEmail(adminEmailPayload)
                                                         })
                                                         const saved = await createPromise
                                                         if (saved?.trackingId) localStorage.setItem('lastTrackingId', String(saved.trackingId))
