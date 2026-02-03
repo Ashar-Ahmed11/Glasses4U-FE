@@ -14,7 +14,8 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <PayPalScriptProvider options={{ "client-id": "AQwDvnhLqAF9T39k3BE2xc5kmgy54ZTNcXjAKiBkLPiG5RGP-vqHgkOTdJAaVicnH_UzoaKkiobDLAg8" }}>
+  // <PayPalScriptProvider options={{ "client-id": "AQwDvnhLqAF9T39k3BE2xc5kmgy54ZTNcXjAKiBkLPiG5RGP-vqHgkOTdJAaVicnH_UzoaKkiobDLAg8" }}>
+  <PayPalScriptProvider options={{ "client-id": "AeVzDO21oRWGO_pguaTtQ5_URjALnxWTpIF1Cz0At7BMTmzb2UIg8DJ4B6mc-juXzwoI-LLN2bGJA5RQ" }}>
   <BrowserRouter>
     <AppState>
       <>
