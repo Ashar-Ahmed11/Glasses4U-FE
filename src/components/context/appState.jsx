@@ -190,8 +190,8 @@ const AppState = (props) => {
       ])
     }
           openCart()
-  }
-
+        }
+    
   const updateProduct = (item, quantity) => {
     if (quantity < 1) {
       setCart(cart.filter((e) => e.id !== item.id))

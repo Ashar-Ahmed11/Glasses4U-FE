@@ -2,10 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./ProductCard.css";
 
-const ProductCard = ({ product, to }) => {
+const ProductCard = ({ product, to, onClick }) => {
   const onErr = (e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/logo192.png" }
   return (
-    <Link to={to} className="text-decoration-none text-dark d-flex justify-content-center">
+    <Link to={to} onClick={onClick} className="text-decoration-none text-dark d-flex justify-content-center">
       <div className="product-card card border-0">
         <span className="badge-top">Top rated</span>
         <button className="btn-like" type="button" aria-label="save">❤</button>

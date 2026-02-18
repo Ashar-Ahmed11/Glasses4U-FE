@@ -8,7 +8,7 @@ export default function ImageAdjuster({ imageUrl, setEditImageUrl, onUploaded, m
 	// const date = new Date(1678563468 * 1000)
 	// console.log(date.toUTCString())
 
-    const inputRef = React.useRef();
+	const inputRef = React.useRef();
 
     const triggerFileSelectPopup = () => { if (inputRef.current) { inputRef.current.value = ''; } inputRef.current.click(); }
 
@@ -48,12 +48,12 @@ export default function ImageAdjuster({ imageUrl, setEditImageUrl, onUploaded, m
 		setCroppedArea(croppedAreaPixels);
 	};
 
-    const onSelectFile = (event) => {
+	const onSelectFile = (event) => {
 		if (event.target.files && event.target.files.length > 0) {
 			const reader = new FileReader();
 			reader.readAsDataURL(event.target.files[0]);
 			reader.addEventListener("load", () => {
-                setImage(reader.result);
+				setImage(reader.result);
                 setZoom(1)
                 setCrop({ x: 0, y: 0 })
                 setCroppedArea(null)
@@ -90,10 +90,10 @@ const onUpload = async () => {
         const el = document.getElementById(modalId)
         if (!el) return
         const handler = () => {
-            setImage(null)
-            setZoom(1)
+		setImage(null)
+		setZoom(1)
             setCrop({ x: 0, y: 0 })
-            setCroppedArea(null)
+		setCroppedArea(null)
             if (inputRef.current) inputRef.current.value = ''
         }
         el.addEventListener('hidden.bs.modal', handler)
@@ -104,7 +104,7 @@ const onUpload = async () => {
 
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-			<div className='container-cropper'>
+		 <div className='container-cropper'>
 				{image && (
 					<>
 						<div className='cropper' style={{ position: "relative", width: "100%", height: "300px", background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
@@ -132,7 +132,7 @@ const onUpload = async () => {
 					</>
 				)}
 			</div>
-
+			
 			<div className='container-buttons d-flex align-items-center gap-2'>
 				<input
 					type='file'

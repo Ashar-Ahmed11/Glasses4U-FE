@@ -68,6 +68,7 @@ export default function ProductView() {
     { label: 'Color', value: fs.color || '' },
     { label: 'Shape', value: fs.shape || '' },
     { label: 'Material', value: fs.material || '' },
+    { label: 'Gender', value: fs.gender ? `${String(fs.gender).charAt(0).toUpperCase()}${String(fs.gender).slice(1)}` : '' },
   ].filter(r => r.value)
 
   return (
@@ -75,7 +76,7 @@ export default function ProductView() {
       <Header />
       <div className="container py-4">
         <div className="row g-4">
-          <div className="col-md-6">
+              <div className="col-md-6">
             <div>
               <style>{`
                 .thumbnail .keen-slider__slide img { border: 2px solid transparent; border-radius: 6px; }
@@ -86,23 +87,23 @@ export default function ProductView() {
                   <div className="keen-slider__slide number-slide" key={i}>
                     <div className="d-flex justify-content-center" style={{ position: 'absolute', zIndex: 2, opacity: imgLoaded ? 0 : 1, alignItems: 'center', width: '100%', height: '100%' }}>
                       <div className="spinner-border text-warning" role="status" />
-                    </div>
+                            </div>
                     <div className="position-relative product-main-frame" style={{ width: '100%', backgroundColor: '#ffffff' }}>
                       <img onLoad={() => setImgLoaded(true)} src={a.url} alt={product.name} className="position-absolute w-100 h-100" style={{ objectFit: 'contain', top: 0 }} />
-                    </div>
-                  </div>
+                            </div>
+                          </div>
                 ))}
-              </div>
+                      </div>
 
               <div ref={thumbnailRef} className="keen-slider thumbnail \mt-2">
                 {product.assets?.length > 1 && product.assets.map((a, i) => (
                   <div className="keen-slider__slide number-slide d-flex align-items-center" key={i}>
                     <img src={a.url} alt={product.name} className="w-100 px-2 py-4 py-md-2" />
-                  </div>
+                            </div>
                 ))}
-              </div>
-            </div>
-          </div>
+                            </div>
+                          </div>
+                      </div>
           <div className="col-md-6">
             <h2 style={{ color }}>{product.name}</h2>
             <div className="h4" style={{ color }}>{priceConverter(unitPrice)}</div>
@@ -155,7 +156,7 @@ export default function ProductView() {
                 {wishLoading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                 {wishLoading ? 'Adding...' : 'Add to wishlist'}
               </button>
-            </div>
+                    </div>
 
             {/* Meta info block */}
             <div className="mt-3 py-3 px-2 px-md-3">
@@ -184,20 +185,20 @@ export default function ProductView() {
                 <span className="d-inline-flex align-items-center"><i className="fa fa-undo fa-lg me-2" />24/7 Support</span>
                 <span className="d-inline-flex align-items-center"><i className="fa fa-lock fa-lg me-2" />Secure checkout</span>
               </div>
-            </div>
+                    </div>
 
             <PrescriptionModal onComplete={(payload) => addProductWithPrescription(product, quantity, selectedSize, payload)} />
           </div>
         </div>
-      </div>
+                  </div>
       <div className="container pb-5">
         <div className="row g-4">
           <div className="col-lg-6">
             <h5 className="mb-3">Description</h5>
             <div className="card border-0 p-3 bg-light">
               <div style={{ color }} dangerouslySetInnerHTML={{ __html: product.description }} />
-            </div>
-          </div>
+                  </div>
+                  </div>
           <div className="col-lg-6">
             <h5 className="mb-3">More Information</h5>
             <div className="card border-0">
@@ -212,10 +213,10 @@ export default function ProductView() {
                   <li className="list-group-item text-muted">No additional information.</li>
                 )}
               </ul>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
       <Footer />
     </>
   )

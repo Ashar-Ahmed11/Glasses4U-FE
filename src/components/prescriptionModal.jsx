@@ -158,10 +158,11 @@ const PrescriptionModal = ({ onComplete }) => {
                       <div className="row g-3 align-items-end">
                         <div className="col-12">
                           <div className="row text-uppercase small fw-semibold text-muted">
-                            <div className="col-3">SPH</div>
-                            <div className="col-3">CYL</div>
-                            <div className="col-3">AXIS</div>
-                            <div className="col-3">ADD</div>
+                            <div className="col-2"></div>
+                            <div className="col-3 text-center">SPH</div>
+                            <div className="col-3 text-center">CYL</div>
+                            <div className="col-2 text-center">AXIS</div>
+                            <div className="col-2 text-center">ADD</div>
                           </div>
                         </div>
                         {/* OD (Right) */}

@@ -46,7 +46,8 @@ export default function CreateProduct() {
             size: '',
             color: '',
             shape: '',
-            material: ''
+            material: '',
+            gender: ''
         }
     })
     console.log(components.category)
@@ -69,7 +70,8 @@ export default function CreateProduct() {
                 size: components.frameSpecs.size || '',
                 color: components.frameSpecs.color || '',
                 shape: components.frameSpecs.shape || '',
-                material: components.frameSpecs.material || ''
+                material: components.frameSpecs.material || '',
+                gender: components.frameSpecs.gender || ''
             }
         }
         if (prodid) await editProductBE(prodid, payload)
@@ -125,7 +127,8 @@ export default function CreateProduct() {
                         size: frameSpecs?.size ?? '',
                         color: frameSpecs?.color ?? '',
                         shape: frameSpecs?.shape ?? '',
-                        material: frameSpecs?.material ?? ''
+                        material: frameSpecs?.material ?? '',
+                        gender: frameSpecs?.gender ?? ''
                     }
                 })
                 setVariants(vs || [])
@@ -249,6 +252,14 @@ export default function CreateProduct() {
                                     </div>
                                     <div className="col-6 col-md-3">
                                         <input value={components.frameSpecs.material} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, material: e.target.value } })} className="form-control" type="text" placeholder="Material" />
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <select value={components.frameSpecs.gender} onChange={(e) => setComponents({ ...components, frameSpecs: { ...components.frameSpecs, gender: e.target.value } })} className="form-select">
+                                            <option value="">Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="unisex">Unisex</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
