@@ -21,6 +21,8 @@ import ViewCategories from "./viewCategories";
 import Eyewear from "./eyewear";
 import CreateLens from "./createLens";
 import Orders from "./orders";
+import AdminBlogs from "./adminBlogs";
+import CreatePost from "./createPost";
 
 // import { useEffect } from "react";
 const Dashboard = () => {
@@ -194,6 +196,15 @@ const Dashboard = () => {
                             </Route>
                             <Route exact path="/dashboard/orders">
                                 <Orders />
+                            </Route>
+                            <Route exact path="/dashboard/blogs">
+                                <AdminBlogs />
+                            </Route>
+                            <Route exact path="/dashboard/create-post">
+                                <CreatePost />
+                            </Route>
+                            <Route path="/dashboard/create-post/:postid">
+                                <CreatePost />
                             </Route>
                             <Route exact path="/dashboard/transaction">
                                 <h1 className="text-center">Transaction</h1>

@@ -4,8 +4,8 @@ import { useState } from 'react'
 import useLocalStorage from '../useLocalStorage'
 import { toast } from 'react-toastify'
 
-// const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
+// const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 const LOREM = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, debitis. Reprehenderit, illum. Vitae, minus. Nulla laboriosam, dolorum possimus, reiciendis dignissimos aut eaque nihil, consequuntur fuga laudantium repellendus. Aliquid, laborum facilis.</p>'
@@ -105,6 +105,7 @@ const AppState = (props) => {
   const [categories, setCategories] = useState([])
   const [lenses, setLenses] = useState([])
   const [globalLoader, setGlobalLoader] = useState(false)
+  const [posts, setPosts] = useState([])
 
   // helper to extract validator / server errors nicely
   const extractError = async (res, fallback = 'Request failed') => {
@@ -168,7 +169,8 @@ const AppState = (props) => {
     const basePrice = selectedSize ? selectedSize.price : product.price
     const lensPrice = Number(prescription?.lens?.price || 0)
     const coatingPrice = Number(prescription?.coating?.price || 0)
-    const unitPrice = Number(basePrice) + lensPrice + coatingPrice
+    const tintPrice = Number(prescription?.tint?.tintPrice || 0)
+    const unitPrice = Number(basePrice) + lensPrice + coatingPrice + tintPrice
 
     const existing = cart.find((e) => e.id === itemId)
     if (existing) {
@@ -602,8 +604,64 @@ const AppState = (props) => {
     return await res.json()
   }
 
+  // Blogs/Posts
+  const fetchPosts = async () => {
+    const res = await fetch(`${API_BASE}/api/posts`)
+    if (!res.ok) throw new Error('Fetch posts failed')
+    const data = await res.json()
+    setPosts(Array.isArray(data) ? data : [])
+    return data
+  }
+  const fetchPostBySlug = async (slug) => {
+    const res = await fetch(`${API_BASE}/api/posts/slug/${encodeURIComponent(slug || '')}`)
+    if (!res.ok) return null
+    return await res.json()
+  }
+  const fetchPostById = async (id) => {
+    const res = await fetch(`${API_BASE}/api/posts/${id}`)
+    if (!res.ok) return null
+    return await res.json()
+  }
+  const createPost = async (payload) => {
+    const res = await fetch(`${API_BASE}/api/posts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const msg = await extractError(res, 'Create post failed')
+      throw new Error(msg)
+    }
+    const data = await res.json()
+    toast.success('Post created')
+    return data
+  }
+  const editPost = async (id, payload) => {
+    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const msg = await extractError(res, 'Update post failed')
+      throw new Error(msg)
+    }
+    const data = await res.json()
+    toast.success('Post updated')
+    return data
+  }
+  const deletePost = async (id) => {
+    const res = await fetch(`${API_BASE}/api/posts/${id}`, {
+      method: 'DELETE',
+      headers: { 'auth-token': adminToken },
+    })
+    if (!res.ok) throw new Error('Delete post failed')
+    toast.info('Post deleted')
+    return true
+  }
+
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, globalLoader, setGlobalLoader }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )

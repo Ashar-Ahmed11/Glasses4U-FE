@@ -19,7 +19,7 @@ export default function Cart() {
     if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).show()
   }
   const RX_LABEL = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
-  const LT_LABEL = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun' }
+  const LT_LABEL = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun', sunglasses: 'Sunglasses (Always Dark)' }
   const toLabel = (v, sign = true) => (typeof v === 'number' ? `${v >= 0 && sign ? '+' : ''}${v.toFixed(2)}` : 'None')
   return (
     <div>
@@ -131,6 +131,32 @@ export default function Cart() {
                       <span className="text-muted">Coating</span>
                       <span>{rxItem?.prescription?.coating?.title?.toUpperCase?.() || 'None'}</span>
                     </div>
+                    {rxItem?.prescription?.tint && (
+                      <>
+                        <div className="list-group-item d-flex justify-content-between">
+                          <span className="text-muted">Tint</span>
+                          <span>
+                            {rxItem.prescription.tint.tintName}
+                            {typeof rxItem.prescription.tint.tintPrice === 'number' ? ` + $${Number(rxItem.prescription.tint.tintPrice).toFixed(2)}` : ''}
+                          </span>
+                        </div>
+                        {rxItem.prescription.tint.tintIntensity && (
+                          <div className="list-group-item d-flex justify-content-between">
+                            <span className="text-muted">Tint Intensity</span>
+                            <span>{rxItem.prescription.tint.tintIntensity}</span>
+                          </div>
+                        )}
+                        <div className="list-group-item d-flex justify-content-between align-items-center">
+                          <span className="text-muted">Tint Color</span>
+                          <span className="d-flex align-items-center gap-2">
+                            {rxItem.prescription.tint.tintImage && (
+                              <img src={rxItem.prescription.tint.tintImage} alt={rxItem.prescription.tint.tintColorName || 'Tint'} style={{ width: 24, height: 24, borderRadius: '50%', border: '1px solid #ddd', objectFit: 'cover' }} />
+                            )}
+                            <span>{rxItem.prescription.tint.tintColorName || ''}</span>
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </>
               )}

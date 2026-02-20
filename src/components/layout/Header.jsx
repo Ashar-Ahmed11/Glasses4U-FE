@@ -199,6 +199,9 @@ const Header = () => {
                 </li>
               ))}
               <li className="nav-item">
+                <Link className="nav-link fs-4 text-dark" to="/blogs" onClick={closeMobileOffcanvas}>Blogs</Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link fs-4 text-dark" to="/contact" onClick={closeMobileOffcanvas}>Contact Us</Link>
               </li>
               <li className="nav-item">
@@ -332,6 +335,9 @@ const Header = () => {
                 </Link>
               </li>
             ))}
+            <li className="nav-item mx-3">
+              <Link className="nav-link fw-semibold text-dark" to="/blogs">Blogs</Link>
+            </li>
             <li className="nav-item mx-3">
               <Link className="nav-link fw-semibold text-dark" to="/contact">Contact Us</Link>
             </li>

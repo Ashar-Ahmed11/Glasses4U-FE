@@ -18,11 +18,11 @@ export default function About() {
         </div>
         <div className="shade w-100 h-100" style={{ zIndex: 20, position: 'absolute', inset: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', zIndex: 10 }} />
-        <div style={{zIndex:30}} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
+        <div style={{ zIndex: 30 }} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
           <h1 className="display-4 fw-bold">Clear Vision. Confident Style. </h1>
           <p className="lead">Crafting prescription eyewear designed for comfort, clarity, and modern style.
- At Glasses 4U, we believe great vision should be easy, affordable, and effortless. That’s why we create high-quality prescription eyewear that helps you see clearly and feel confident every single day.
-</p>
+            At Glasses 4U, we believe great vision should be easy, affordable, and effortless. That’s why we create high-quality prescription eyewear that helps you see clearly and feel confident every single day.
+          </p>
         </div>
       </section>
 
@@ -33,8 +33,8 @@ export default function About() {
             <h2 className="fw-bold mb-3">Our Story</h2>
             <p>
               Glasses 4U was created with one simple goal: make premium eyewear accessible to everyone.
-Traditional optical stores add layers of markup that drive prices up. We decided to do things differently. By working with our in-house lab and carefully curated frame collections, we’re able to deliver expertly crafted lenses and stylish frames without the inflated costs.
-From your prescription to your doorstep, every step is handled with care and transparency.
+              Traditional optical stores add layers of markup that drive prices up. We decided to do things differently. By working with our in-house lab and carefully curated frame collections, we’re able to deliver expertly crafted lenses and stylish frames without the inflated costs.
+              From your prescription to your doorstep, every step is handled with care and transparency.
 
             </p>
 

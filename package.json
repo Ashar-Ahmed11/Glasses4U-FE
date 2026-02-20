@@ -18,6 +18,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-easy-crop": "^5.5.3",
+    "react-helmet": "^6.1.0",
+    "react-meta-tags": "^1.0.1",
     "react-paypal-button-v2": "^2.6.3",
     "react-router-dom": "^5.3.4",
     "react-scripts": "5.0.1",

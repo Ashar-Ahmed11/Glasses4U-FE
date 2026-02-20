@@ -25,6 +25,28 @@ export default function BasicInfo() {
             <input value={basicInfo?.phoneNumber || ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, phoneNumber: value })} style={{ color: color}} type="text" placeholder='Phone Number' className="form-control my-2" />
             <input value={basicInfo?.deliveryCharges ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, deliveryCharges: Number(value) })} style={{ color: color}} type="number" placeholder='Delivery Charges' className="form-control my-2" />
             <input value={basicInfo?.standardCoatingPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, standardCoatingPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Standard Coating Price' className="form-control my-2" />
+            <input value={basicInfo?.premiumCoatingPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, premiumCoatingPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Premium Coating Price' className="form-control my-2" />
+            <input value={basicInfo?.bluecutCoatingPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, bluecutCoatingPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Blue Cut Coating Price' className="form-control my-2" />
+            <div className="row">
+              <div className="col-md-6">
+                <input value={basicInfo?.solidTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, solidTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Solid Tint Price' className="form-control my-2" />
+              </div>
+              <div className="col-md-6">
+                <input value={basicInfo?.gradientTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, gradientTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Gradient Tint Price' className="form-control my-2" />
+              </div>
+              <div className="col-md-6">
+                <input value={basicInfo?.mirrorTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, mirrorTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Mirror Tint Price' className="form-control my-2" />
+              </div>
+              <div className="col-md-6">
+                <input value={basicInfo?.dualTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, dualTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Dual Tint Price' className="form-control my-2" />
+              </div>
+              <div className="col-md-6">
+                <input value={basicInfo?.polarizedMirrorTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, polarizedMirrorTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Polarized Mirror Tint Price' className="form-control my-2" />
+              </div>
+              <div className="col-md-6">
+                <input value={basicInfo?.polarizedTintPrice ?? ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, polarizedTintPrice: Number(value) })} style={{ color: color}} type="number" step="0.01" placeholder='Polarized Tint Price' className="form-control my-2" />
+              </div>
+            </div>
             <input value={basicInfo?.email || ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, email: value })} style={{ color: color}} type="email" placeholder='Email' className="form-control my-2" />
             <input value={basicInfo?.officeAddress || ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, officeAddress: value })} style={{ color: color}} type="text" placeholder='Office Address' className="form-control my-2" />
             <textarea value={basicInfo?.footerDescription || ''} onChange={({ target: { value } }) => setBasicInfo({ ...basicInfo, footerDescription: value })} style={{ color: color}} placeholder='Footer Description' className="form-control my-2" />

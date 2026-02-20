@@ -16,6 +16,16 @@ const AdminLinks = ({ mobile }) => {
         </Link>
       </li>
       <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-2">
+        <Link to="/dashboard/create-post" className={`py-3 customlinks nav-link ${isActive("/dashboard/create-post") ? "active" : ""}`}>
+          <i className="fa fa-plus-square me-2"></i> <span className="ms-1 text-light">Create Post</span>
+        </Link>
+      </li>
+      <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-2">
+        <Link to="/dashboard/blogs" className={`py-3 customlinks nav-link ${isActive("/dashboard/blogs") ? "active" : ""}`}>
+          <i className="fa fa-newspaper me-2"></i> <span className="ms-1 text-light">View Blogs</span>
+        </Link>
+      </li>
+      <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-2">
         <Link to="/dashboard/eyewear" className={`py-3 customlinks nav-link ${isActive("/dashboard/eyewear") ? "active" : ""}`}>
           <i className="fa fa-eye me-2"></i> <span className="ms-1 text-light">Eyewear</span>
         </Link>

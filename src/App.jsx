@@ -23,6 +23,8 @@ import Faqs from './pages/Faqs';
 import OrderingGuide from './pages/OrderingGuide';
 import PupilDistance from './pages/PupilDistance';
 import ShippingPolicy from './pages/ShippingPolicy';
+import Blogs from './components/blogs';
+import BlogDetail from './components/blogDetail';
 const Success = () => {
   const tracking = localStorage.getItem('lastTrackingId') || ''
   return (
@@ -66,6 +68,8 @@ function App() {
         <Route path="/shipping-policy" exact><ShippingPolicy /></Route>
         <Route path="/terms" exact><Terms /></Route>
         <Route path="/faqs" exact><Faqs /></Route>
+        <Route path="/blogs" exact><Blogs title="Blogs" description="Latest insights and resources" showBrand={false} /></Route>
+        <Route path="/blog/:slug" exact><BlogDetail /></Route>
         <Route path="/users" exact><div className="container py-5"><h1>Users</h1></div></Route>
       </Switch>
       <BigLoader />

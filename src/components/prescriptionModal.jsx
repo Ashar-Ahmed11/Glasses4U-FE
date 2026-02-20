@@ -5,6 +5,78 @@ import Img2 from '../images/2.png'
 import Img3 from '../images/3.png'
 import Img4 from '../images/4.png'
 
+// Tints catalog for Sunglasses (Always Dark)
+const TINTS = [
+  {
+    key: 'solid',
+    name: 'Solid Tint',
+    price: 4.95,
+    intensities: ['Light', 'Medium', 'Dark'],
+    colors: [
+      { name: 'Brown', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Brown.png' },
+      { name: 'Blue', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Blue.png' },
+      { name: 'Black', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Black.png' },
+      { name: 'Yellow', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Yellow.png' },
+      { name: 'Gray', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Grey.png' },
+      { name: 'Green', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Green.png' },
+    ],
+  },
+  {
+    key: 'gradient',
+    name: 'Gradient Tint Sunglasses',
+    price: 9.25,
+    colors: [
+      { name: 'Grey Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Grey-Gradient.png' },
+      { name: 'Yellow Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Yellow-Gradient.png' },
+      { name: 'Green Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Green-Gradient.png' },
+      { name: 'Blue Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Blue-Gradient.png' },
+      { name: 'Black Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Black-Gradient.png' },
+      { name: 'Brown Gradient', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Gradient/Brown-Gradient.png' },
+    ],
+  },
+  {
+    key: 'mirror',
+    name: 'Mirror Tint Sunglasses',
+    price: 12.47,
+    colors: [
+      { name: 'Gold Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Gold-Mirror.png' },
+      { name: 'Blue Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Blue-Mirror.png' },
+      { name: 'Silver Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Grey-Mirror.png' },
+    ],
+  },
+  {
+    key: 'dual',
+    name: 'Dual Tint',
+    price: 11.97,
+    colors: [
+      { name: 'Black & Brown', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/black-and-brown.png' },
+      { name: 'Brown & Yellow', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/brown-and-yellow.png' },
+      { name: 'Blue & Yellow', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/blue-yellow.png' },
+      { name: 'Green & Yellow', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/green-yellow.png' },
+      { name: 'Blue & Pink', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/blue-pink.png' },
+      { name: 'Grey & Pink', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Dual/grey-pink.png' },
+    ],
+  },
+  {
+    key: 'polarized_mirror',
+    name: 'Polarized Mirror Sunglasses',
+    price: 15.95,
+    colors: [
+      { name: 'Silver Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Grey-Mirror.png' },
+      { name: 'Blue Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Blue-Mirror.png' },
+      { name: 'Gold Mirror', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Mirror/Gold-Mirror.png' },
+    ],
+  },
+  {
+    key: 'polarized',
+    name: 'Polarized Sunglasses',
+    price: 12.95,
+    colors: [
+      { name: 'Polarized Grey', image: 'https://www.goggles4u.com/pub/media/rx_images/color/Solid/Solid-Grey.png' },
+    ],
+  },
+]
+
 const range = (start, end, step = 1) => {
   const out = []
   for (let v = start; v <= end + 1e-9; v += step) out.push(Number(v.toFixed(2)))
@@ -59,6 +131,22 @@ const PrescriptionModal = ({ onComplete }) => {
   const [lensType, setLensType] = React.useState(null) // 'clear' | 'photochromic'
   const [lensOption, setLensOption] = React.useState(null) // '1.56' | '1.61' | '1.67'
   const [coating, setCoating] = React.useState(null) // 'standard' | 'none'
+  // Sunglasses tint state (when lensType === 'sunglasses')
+  const [tintType, setTintType] = React.useState(null) // e.g., 'solid', 'gradient'
+  const [tintIntensity, setTintIntensity] = React.useState(null) // Light | Medium | Dark (only for solid)
+  const [tintColor, setTintColor] = React.useState(null) // { name, image }
+  const pricedTints = React.useMemo(() => {
+    const map = {
+      solid: Number(basicInfo?.solidTintPrice || 0),
+      gradient: Number(basicInfo?.gradientTintPrice || 0),
+      mirror: Number(basicInfo?.mirrorTintPrice || 0),
+      dual: Number(basicInfo?.dualTintPrice || 0),
+      polarized_mirror: Number(basicInfo?.polarizedMirrorTintPrice || 0),
+      polarized: Number(basicInfo?.polarizedTintPrice || 0),
+    }
+    return TINTS.map((t) => ({ ...t, price: map[t.key] ?? Number(t.price || 0) }))
+  }, [basicInfo])
+  const selectedTint = React.useMemo(() => pricedTints.find(t => t.key === tintType) || null, [tintType, pricedTints])
 
   const resetAll = React.useCallback(() => {
     setForm(INITIAL_FORM)
@@ -68,6 +156,9 @@ const PrescriptionModal = ({ onComplete }) => {
     setLensType(null)
     setLensOption(null)
     setCoating(null)
+    setTintType(null)
+    setTintIntensity(null)
+    setTintColor(null)
   }, [])
 
   const [loading, setLoading] = React.useState(false)
@@ -85,7 +176,7 @@ const PrescriptionModal = ({ onComplete }) => {
   const lastQueryRef = React.useRef('')
   React.useEffect(() => {
     const RX_MAP = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
-    const LT_MAP = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun' }
+    const LT_MAP = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun', sunglasses: 'Clear Lenses' } // treat sunglasses as clear
     if (step === 4 && rxType && lensType) {
       const queryKey = `${rxType}|${lensType}`
       if (lastQueryRef.current !== queryKey) {
@@ -125,7 +216,7 @@ const PrescriptionModal = ({ onComplete }) => {
                 {[1, 2, 3, 4, 5].map((n) => (
                   <li key={n} className="nav-item">
                     <span
-                      className={`badge rounded-circle ${n === step ? 'bg-primary' : 'bg-light text-dark'}`}
+                      className={`badge rounded-circle ${n === (step === 31 ? 3 : step) ? 'bg-primary' : 'bg-light text-dark'}`}
                       style={{ width: 36, height: 36, lineHeight: '22px', fontSize: 16 }}
                     >
                       {n}
@@ -449,18 +540,27 @@ const PrescriptionModal = ({ onComplete }) => {
                   {[
                     { key: 'clear', title: 'CLEAR LENSES', desc: 'These lenses stays clear indoor and outdoor.' },
                     { key: 'photochromic', title: 'PHOTOCHROMIC - DARK IN SUN', desc: 'They will turn dark in sunlight and stays clear indoor.' },
+                    { key: 'sunglasses', title: 'SUNGLASSES (ALWAYS DARK)', desc: 'Sunglasses in your prescription.' },
                   ].map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
                         type="button"
-                        onClick={() => { setLensType(item.key); setStep(4) }}
+                        onClick={() => {
+                          setLensType(item.key)
+                          if (item.key !== 'sunglasses') setStep(4)
+                          else {
+                            // go to intermediate full-screen Tint Options step
+                            setTintType(null); setTintIntensity(null); setTintColor(null)
+                            setStep(31)
+                          }
+                        }}
                         className={`w-100 text-start bg-white border rounded-3 p-4 h-100 ${lensType === item.key ? 'border-primary shadow' : ''}`}
                       >
                         <div className="text-center fw-bold mb-3">{item.title}</div>
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
                           <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 96, height: 96 }}>
-                            <span className="fs-3">🥽</span>
+                            <span className="fs-3">🕶️</span>
                           </div>
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
@@ -471,6 +571,63 @@ const PrescriptionModal = ({ onComplete }) => {
                 <div className="d-flex justify-content-between mt-4">
                   <button type="button" className="btn btn-outline-secondary" onClick={() => setStep(2)}>Previous</button>
                   {/* <button type="button" className="btn btn-warning text-white" onClick={() => setStep(4)}>Next</button> */}
+                </div>
+              </>
+            )}
+            {/* Step 3.5 - Fullscreen Tint Options for Sunglasses */}
+            {step === 31 && (
+              <>
+                <h3 className="mb-1">Tint Options </h3>
+                <div className="row g-3 mt-2">
+                  {pricedTints.map((t) => (
+                    <div key={t.key} className="col-12 col-md-6">
+                      <div className={`w-100 bg-white border rounded-3 p-3 h-100 ${tintType === t.key ? 'border-primary shadow' : ''}`}>
+                        <div className="fw-bold text-center mb-2">{t.name} + ${t.price.toFixed(2)}</div>
+                        <hr className="my-3" />
+                        {t.key === 'solid' && (
+                          <div className="mb-2 d-flex gap-2 justify-content-start">
+                            {t.intensities.map((iv) => (
+                              <button
+                                key={iv}
+                                type="button"
+                                className={`btn btn-sm ${tintType === 'solid' && tintIntensity === iv ? 'btn-dark' : 'btn-outline-secondary'}`}
+                                onClick={() => { setTintType('solid'); setTintIntensity(iv) }}
+                              >
+                                {iv}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="d-flex flex-wrap gap-3 align-items-center">
+                          {t.colors.map((c) => {
+                            const active = tintType === t.key && tintColor?.name === c.name
+                            return (
+                              <button
+                                key={c.name}
+                                type="button"
+                                onClick={() => { setTintType(t.key); setTintColor(c) }}
+                                className={`border-0 bg-transparent p-0 ${active ? 'shadow-sm' : ''}`}
+                                title={c.name}
+                              >
+                                <img src={c.image} alt={c.name} style={{ width: 36, height: 36, borderRadius: '50%', border: active ? '2px solid #0d6efd' : '1px solid #ddd', objectFit: 'cover' }} />
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="d-flex justify-content-between mt-4">
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => setStep(3)}>Previous</button>
+                  <button
+                    type="button"
+                    className="btn btn-warning text-white"
+                    disabled={!tintType || !tintColor || (tintType === 'solid' && !tintIntensity)}
+                    onClick={() => setStep(4)}
+                  >
+                    Next
+                  </button>
                 </div>
               </>
             )}
@@ -513,8 +670,12 @@ const PrescriptionModal = ({ onComplete }) => {
                 <div className="row g-3 mt-2">
                   {(() => {
                     const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
+                    const premiumPrice = Number(basicInfo?.premiumCoatingPrice || 0)
+                    const bluecutPrice = Number(basicInfo?.bluecutCoatingPrice || 0)
                     const items = [
                       { key: 'standard', title: `STANDARD COATINGS+ $${standardPrice.toFixed(2)}`, desc: 'Anti-Reflective, UV and Scratch Resistance', price: standardPrice },
+                      { key: 'premium', title: `PREMIUM COATINGS+ $${premiumPrice.toFixed(2)}`, desc: 'Anti-Reflective, Hydrophobic, UV and Scratch Resistance', price: premiumPrice },
+                      { key: 'bluecut', title: `BLUE CUT DIGITAL PROTECTION+ $${bluecutPrice.toFixed(2)}`, desc: 'Digital Screen Protection and All Premium Coatings', price: bluecutPrice },
                       { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.', price: 0 },
                     ]
                     return items
@@ -545,12 +706,28 @@ const PrescriptionModal = ({ onComplete }) => {
                     onClick={() => {
                       const lens = (lenses || []).find((l) => String(l._id) === String(lensOption)) || null
                       const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
-                      const coatingMap = { standard: { key: 'standard', title: 'Standard Coatings', price: standardPrice }, none: { key: 'none', title: 'No Coatings', price: 0 } }
+                      const premiumPrice = Number(basicInfo?.premiumCoatingPrice || 0)
+                      const bluecutPrice = Number(basicInfo?.bluecutCoatingPrice || 0)
+                      const coatingMap = {
+                        standard: { key: 'standard', title: 'Standard Coatings', price: standardPrice },
+                        premium: { key: 'premium', title: 'Premium Coatings', price: premiumPrice },
+                        bluecut: { key: 'bluecut', title: 'Blue Cut Digital Protection', price: bluecutPrice },
+                        none: { key: 'none', title: 'No Coatings', price: 0 },
+                      }
                       const payload = {
                         rxType,
                         lensType,
                         lens: lens ? { id: lens._id, title: lens.title, price: Number(lens.price || 0), thickness: lens.thickness } : null,
                         coating: coatingMap[coating] || { key: 'none', title: 'No Coatings', price: 0 },
+                        ...(lensType === 'sunglasses' && selectedTint && tintColor ? {
+                          tint: {
+                            tintName: selectedTint.name,
+                            tintPrice: selectedTint.price,
+                            tintIntensity: selectedTint.key === 'solid' ? tintIntensity : undefined,
+                            tintImage: tintColor.image,
+                            tintColorName: tintColor.name,
+                          }
+                        } : {}),
                         prescription: {
                           hasTwoPD,
                           od: { sph: form.od_sph, cyl: form.od_cyl, axis: form.od_axis, add: form.od_add },
