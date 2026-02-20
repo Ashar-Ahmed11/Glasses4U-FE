@@ -131,4 +131,16 @@
   background: transparent;
 }
 .mobile-nav .fa { font-size: 22px; color: #000; }
+
+.circle-wrapper {
+  width: 96px;              /* any size you want */
+  aspect-ratio: 1 / 1;      /* 🔥 forces perfect square */
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 .mobile-nav .nav-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }

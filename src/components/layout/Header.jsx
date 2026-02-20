@@ -207,6 +207,9 @@ const Header = () => {
               <li className="nav-item">
                 <Link className="nav-link fs-4 text-dark" to="/terms" onClick={closeMobileOffcanvas}>Terms &amp; Conditions</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link fs-4 text-dark" to="/help" onClick={closeMobileOffcanvas}>Help Center</Link>
+              </li>
             </ul>
           ) : (
             <div>
@@ -337,6 +340,9 @@ const Header = () => {
             </li>
             <li className="nav-item mx-3">
               <Link className="nav-link fw-semibold text-dark" to="/terms">Terms &amp; Conditions</Link>
+            </li>
+            <li className="nav-item mx-3">
+              <Link className="nav-link fw-semibold text-dark" to="/help">Help Center</Link>
             </li>
           </ul>
         </div>

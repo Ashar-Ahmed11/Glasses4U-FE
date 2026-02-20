@@ -18,6 +18,11 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Terms from './pages/Terms';
 import BigLoader from './components/ui/BigLoader';
+import HelpCenter from './pages/HelpCenter';
+import Faqs from './pages/Faqs';
+import OrderingGuide from './pages/OrderingGuide';
+import PupilDistance from './pages/PupilDistance';
+import ShippingPolicy from './pages/ShippingPolicy';
 const Success = () => {
   const tracking = localStorage.getItem('lastTrackingId') || ''
   return (
@@ -55,7 +60,12 @@ function App() {
 
         <Route path="/about" exact><About /></Route>
         <Route path="/contact" exact><Contact /></Route>
+        <Route path="/help" exact><HelpCenter /></Route>
+        <Route path="/ordering-guide" exact><OrderingGuide /></Route>
+        <Route path="/pupil-distance" exact><PupilDistance /></Route>
+        <Route path="/shipping-policy" exact><ShippingPolicy /></Route>
         <Route path="/terms" exact><Terms /></Route>
+        <Route path="/faqs" exact><Faqs /></Route>
         <Route path="/users" exact><div className="container py-5"><h1>Users</h1></div></Route>
       </Switch>
       <BigLoader />

@@ -1,5 +1,9 @@
 import React from 'react'
 import AppContext from './context/appContext'
+import Img1 from '../images/1.png'
+import Img2 from '../images/2.png'
+import Img3 from '../images/3.png'
+import Img4 from '../images/4.png'
 
 const range = (start, end, step = 1) => {
   const out = []
@@ -394,10 +398,10 @@ const PrescriptionModal = ({ onComplete }) => {
                 <h3 className="mb-1">Step 2 - Rx Type</h3>
                 <div className="row g-3 mt-2">
                   {[
-                    { key: 'distance', title: 'DISTANCE', desc: 'Corrects vision of distant objects. All time wear.' },
-                    { key: 'reading', title: 'READING', desc: 'Corrects vision of near objects.' },
-                    { key: 'bifocal', title: 'BIFOCAL WITH LINE', desc: 'Correct near & distance vision and has a visible line in the lens.' },
-                    { key: 'progressive', title: 'PROGRESSIVE (NO LINE)', desc: 'Corrects near & distance vision and does not have any visible line.' },
+                    { key: 'distance', title: 'DISTANCE', desc: 'Corrects vision of distant objects. All time wear.', img:Img1 },
+                    { key: 'reading', title: 'READING', desc: 'Corrects vision of near objects.', img:Img2 },
+                    { key: 'bifocal', title: 'BIFOCAL WITH LINE', desc: 'Correct near & distance vision and has a visible line in the lens.' , img:Img3},
+                    { key: 'progressive', title: 'PROGRESSIVE (NO LINE)', desc: 'Corrects near & distance vision and does not have any visible line.',img:Img4 },
                   ].map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
@@ -409,9 +413,23 @@ const PrescriptionModal = ({ onComplete }) => {
                         <div className="text-center fw-bold mb-3">{item.title}</div>
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
-                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 96, height: 96 }}>
-                            <span className="fs-3">👓</span>
-                          </div>
+                          <div
+  className="rounded-circle bg-light border d-flex align-items-center justify-content-center px-5"
+  style={{
+    width: "96px",
+    height: "96px",
+    overflow: "hidden"   // 🔥 This is the key
+  }}
+>
+  <img
+    src={item.img}
+    alt=""
+    style={{
+      maxWidth: "86px",
+      maxHeight: "85px",
+    }}
+  />
+</div> 
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
                       </button>

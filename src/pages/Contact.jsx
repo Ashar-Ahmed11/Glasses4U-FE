@@ -2,6 +2,8 @@ import React, { useContext, useEffect } from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 import AppContext from '../components/context/appContext'
+import CoverImg from '../images/contact Coverimg.png'
+import Ourlab from '../images/ourlab.png'
 
 export default function Contact() {
   const { basicInfo, getBasicInfo } = useContext(AppContext)
@@ -18,7 +20,7 @@ export default function Contact() {
       <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>
           <img
-            src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1600&auto=format&fit=crop"
+            src={CoverImg}
             alt="Contact Glasses 4U"
             className="position-absolute top-0 start-0 w-100 h-100"
             style={{ objectFit: 'cover' }}
@@ -57,7 +59,7 @@ At Glasses-4U, your satisfaction matters for us and real help is just a message 
           </div>
           <div className="col-md-4">
             <div className="card border-0 bg-light h-100 p-3">
-              <img className="rounded mb-3" alt="store" src="https://images.unsplash.com/photo-1525909002-1b05e0c869d8?q=80&w=1200&auto=format&fit=crop" style={{ height: 180, width: '100%', objectFit: 'cover' }} />
+              <img className="rounded mb-3" alt="store" src={Ourlab} style={{ height: 180, width: '100%', objectFit: 'cover' }} />
               <h5>Our Lab</h5>
               <p>Every pair of eye glasses is crafted and inspected in our lab to ensure accuracy, clarity, and quality you can trust.</p>
             </div>
