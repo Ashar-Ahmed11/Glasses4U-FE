@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import MetaDecorator from '../components/metaDecorator'
 import Coverimg from '../images/FAQs.png'
 
 const faqs = [
@@ -155,6 +156,7 @@ const Faqs = () => {
       `}</style>
 
       <Header />
+      <MetaDecorator title="FAQs | Glasses 4U" description="Find answers about ordering, prescriptions, shipping, coatings, and more." />
 
       {/* Hero */}
       <section className="position-relative">

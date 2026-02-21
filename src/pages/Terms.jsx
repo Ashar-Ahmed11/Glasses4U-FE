@@ -1,11 +1,13 @@
 import React from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import MetaDecorator from '../components/metaDecorator'
 
 export default function Terms() {
   return (
     <>
       <Header />
+      <MetaDecorator title="Terms & Conditions | Glasses 4U" description="Read our ordering, returns, warranty, and privacy terms and policies." />
       {/* Hero */}
       <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>

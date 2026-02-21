@@ -11,15 +11,17 @@ import MutationPlugin from './mutationPlugin'
 import ThumbnailPlugin from './thumbnailPlugin'
 import PrescriptionModal from './prescriptionModal'
 import { toast } from 'react-toastify'
+import FeaturedProducts from './ui/FeaturedProducts'
 
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 export default function ProductView() {
   const { productid } = useParams()
-  const { addProductWithPrescription, fetchSingleProductBE, addToWishlist, userToken, basicInfo, getBasicInfo, setGlobalLoader } = useContext(AppContext)
+  const { addProductWithPrescription, fetchSingleProductBE, addToWishlist, userToken, basicInfo, getBasicInfo, setGlobalLoader, fetchProductsByCategorySlug } = useContext(AppContext)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [related, setRelated] = useState([])
 
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState(null)
@@ -52,12 +54,30 @@ export default function ProductView() {
     return () => { mounted = false }
   }, [productid]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!basicInfo) getBasicInfo() }, []) // load shipping info
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        setRelated([])
+        const categoryId = product?.category?._id || product?.category
+        if (!categoryId) return
+        console.log(categoryId);
+        const prods = await fetchProductsByCategorySlug(categoryId)
+        console.log("prods", prods);
+        if (!mounted) return
+        const filtered = (prods || []).filter(p => p?._id !== product?._id)
+        setRelated(filtered)
+      } catch { /* noop */ }
+    })()
+    return () => { mounted = false }
+  }, [product]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return (<><Header /><div className="container py-5">Loading...</div><Footer /></>)
   if (error || !product) return (<><Header /><div className="container py-5">Product not found.</div><Footer /></>)
 
   const color = '#212427'
-  const unitPrice = selectedSize ? selectedSize.price : product.price
+  const basePrice = selectedSize ? (Number(selectedSize?.salePrice) > 0 ? Number(selectedSize.salePrice) : Number(selectedSize.price)) : (Number(product?.salePrice) > 0 ? Number(product.salePrice) : Number(product.price))
+  const unitPrice = basePrice
   const fs = product?.frameSpecs || {}
   const eta = new Date(Date.now() + 5 * 864e5).toLocaleDateString()
   const specRows = [
@@ -106,7 +126,18 @@ export default function ProductView() {
                       </div>
           <div className="col-md-6">
             <h2 style={{ color }}>{product.name}</h2>
-            <div className="h4" style={{ color }}>{priceConverter(unitPrice)}</div>
+            <div className="h4" style={{ color }}>
+              {(selectedSize && Number(selectedSize?.salePrice) > 0) || (!selectedSize && Number(product?.salePrice) > 0) ? (
+                <>
+                  <span className="text-muted me-2" style={{ textDecoration: 'line-through' }}>
+                    {priceConverter(selectedSize ? Number(selectedSize.price) : Number(product.price))}
+                  </span>
+                  <span className="text-danger">{priceConverter(unitPrice)}</span>
+                </>
+              ) : (
+                priceConverter(unitPrice)
+              )}
+            </div>
 
             {product.variants?.length > 0 && (
               <div className="my-3">
@@ -217,6 +248,12 @@ export default function ProductView() {
               </div>
             </div>
           </div>
+      {related?.length > 0 && (
+        <div className="container pb-5">
+          <h5 className="mb-3">Browse Other Products</h5>
+          <FeaturedProducts items={related} />
+        </div>
+      )}
       <Footer />
     </>
   )

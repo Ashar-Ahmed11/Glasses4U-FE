@@ -2,6 +2,7 @@ import React from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 import Coverimg from '../images/help center.png'
+import MetaDecorator from '../components/metaDecorator'
 import {
   BrowserRouter as Router,
   Switch,
@@ -56,6 +57,7 @@ const HelpCenter = () => {
   return (
      <>
       <Header />
+      <MetaDecorator title="Help Center | Glasses 4U" description="Guides for ordering, measuring PD, shipping policy, FAQs, and terms." />
 
       {/* Hero */}
       

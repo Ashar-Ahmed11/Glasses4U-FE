@@ -12,7 +12,7 @@ const VariantsManager = ({variants, setVariants}) => {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    setVariants([...variants, { variant: "", price: "" }]);
+    setVariants([...variants, { variant: "", price: "", salePrice: "" }]);
   };
 
   const handleDelete = (e, index) => {
@@ -46,6 +46,15 @@ const VariantsManager = ({variants, setVariants}) => {
             value={variant.price}
             onChange={(e) =>
               handleChange(index, "price", Number(e.target.value))
+            }
+          />
+          <input
+            type="number"
+            className="form-control"
+            placeholder="Variant Sale Price"
+            value={variant.salePrice || ""}
+            onChange={(e) =>
+              handleChange(index, "salePrice", Number(e.target.value))
             }
           />
           <span

@@ -1,11 +1,13 @@
 import React from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import MetaDecorator from '../components/metaDecorator'
 
 export default function About() {
   return (
     <>
       <Header />
+      <MetaDecorator title="About | Glasses 4U" description="Learn about our story, quality eyewear, and what sets us apart." />
       {/* Hero */}
       <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>

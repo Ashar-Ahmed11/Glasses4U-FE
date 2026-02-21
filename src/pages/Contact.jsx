@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 import AppContext from '../components/context/appContext'
+import MetaDecorator from '../components/metaDecorator'
 import CoverImg from '../images/contact Coverimg.png'
 import Ourlab from '../images/ourlab.png'
 
@@ -16,6 +17,7 @@ export default function Contact() {
   return (
     <>
       <Header />
+      <MetaDecorator title="Contact Us | Glasses 4U" description="Get in touch for support, prescriptions, orders, and delivery assistance." />
       {/* Hero */}
       <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>

@@ -1,12 +1,14 @@
 import React from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import MetaDecorator from '../components/metaDecorator'
 import Coverimg from '../images/shipping policy.png'
 
 const ShippingPolicy = () => {
   return (
     <>
       <Header />
+      <MetaDecorator title="Shipping Policy | Glasses 4U" description="Learn about our shipping timelines, methods, charges, and return policies." />
 
         <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>

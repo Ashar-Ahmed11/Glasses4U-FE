@@ -33,10 +33,10 @@ const Blogs = ({ title, description, showBrand }) => {
         <div className="shade w-100 h-100" style={{ zIndex: 20, position: 'absolute', inset: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', zIndex: 10 }} />
         <div style={{ zIndex: 30 }} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
-          <h1 className="display-4 fw-bold">Clear Vision. Confident Style. </h1>
-          <p className="lead">Crafting prescription eyewear designed for comfort, clarity, and modern style.
+          <h1 className="display-4 fw-bold">Blogs</h1>
+          {/* <p className="lead">Crafting prescription eyewear designed for comfort, clarity, and modern style.
             At Glasses 4U, we believe great vision should be easy, affordable, and effortless. That’s why we create high-quality prescription eyewear that helps you see clearly and feel confident every single day.
-          </p>
+          </p> */}
         </div>
       </section>
             <div style={{ backgroundColor: '#fff' }}>

@@ -4,7 +4,7 @@ import ResizePlugin from '../resizePlugin';
 import MutationPlugin from '../mutationPlugin';
 import AppContext from '../context/appContext';
 import ProductCard from './productCard';
-const FeaturedProducts = ({ onLoaded }) => {
+const FeaturedProducts = ({ onLoaded, items: externalItems }) => {
     const [ref] = useKeenSlider({
         
         renderMode: 'auto',
@@ -26,14 +26,21 @@ const FeaturedProducts = ({ onLoaded }) => {
         }
     }, [ResizePlugin, MutationPlugin]);
     const { fetchHomePreviewProducts } = useContext(AppContext)
-    const [items, setItems] = useState([])
-    useEffect(() => { (async () => {
-        try {
-            const list = await fetchHomePreviewProducts(); setItems(list || [])
-        } finally {
-            onLoaded && onLoaded()
+    const [items, setItems] = useState(externalItems || [])
+    useEffect(() => { setItems(externalItems || []) }, [externalItems])
+    useEffect(() => {
+        if (externalItems && Array.isArray(externalItems)) {
+            onLoaded && onLoaded(); 
+            return;
         }
-    })() }, [])
+        (async () => {
+            try {
+                const list = await fetchHomePreviewProducts(); setItems(list || [])
+            } finally {
+                onLoaded && onLoaded()
+            }
+        })()
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     return (
         <>
             <div ref={ref} className="keen-slider px-4">

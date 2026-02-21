@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
+import MetaDecorator from '../components/metaDecorator'
 import Coverimg from '../images/odering guide.png'
 import SS1 from '../images/1stSS.png'
 import SS2 from '../images/2ndSS.png'
@@ -13,6 +14,7 @@ const OrderingGuide = () => {
   return (
     <>
     <Header />
+    <MetaDecorator title="Ordering Guide | Glasses 4U" description="Step-by-step guide to order prescription eyewear online with confidence." />
           {/* Hero */}
     
           <section className="position-relative">

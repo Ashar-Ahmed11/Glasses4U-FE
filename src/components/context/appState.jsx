@@ -4,8 +4,8 @@ import { useState } from 'react'
 import useLocalStorage from '../useLocalStorage'
 import { toast } from 'react-toastify'
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
-// const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
+// const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 const LOREM = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, debitis. Reprehenderit, illum. Vitae, minus. Nulla laboriosam, dolorum possimus, reiciendis dignissimos aut eaque nihil, consequuntur fuga laudantium repellendus. Aliquid, laborum facilis.</p>'
@@ -134,7 +134,9 @@ const AppState = (props) => {
       const updated = cart.map((e) => (e.id === itemId ? { ...e, quantity: e.quantity + quantity } : e))
       setCart(updated)
     } else {
-      const unitPrice = selectedSize ? selectedSize.price : product.price
+      const unitPrice = selectedSize
+        ? (Number(selectedSize?.salePrice) > 0 ? Number(selectedSize.salePrice) : Number(selectedSize.price))
+        : (Number(product?.salePrice) > 0 ? Number(product.salePrice) : Number(product.price))
       setCart([
         ...cart,
         {
@@ -166,7 +168,9 @@ const AppState = (props) => {
       `pd:${rx?.hasTwoPD ? [rx?.pd?.right ?? '', rx?.pd?.left ?? ''].join(',') : (rx?.pd ?? '')}`,
     ].join('|')
     const itemId = `${product._id}|${sizeKey}|${lensId}|${coatingKey}|${rxKey}`
-    const basePrice = selectedSize ? selectedSize.price : product.price
+    const basePrice = selectedSize
+      ? (Number(selectedSize?.salePrice) > 0 ? Number(selectedSize.salePrice) : Number(selectedSize.price))
+      : (Number(product?.salePrice) > 0 ? Number(product.salePrice) : Number(product.price))
     const lensPrice = Number(prescription?.lens?.price || 0)
     const coatingPrice = Number(prescription?.coating?.price || 0)
     const tintPrice = Number(prescription?.tint?.tintPrice || 0)

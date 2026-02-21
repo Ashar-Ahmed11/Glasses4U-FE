@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer';
 import AppContext from '../components/context/appContext';
 import ProductCard from '../components/ui/productCard';
 import CategoryCarousel from '../components/ui/CategoryCarousel';
+import MetaDecorator from '../components/metaDecorator';
 
 const Category = () => {
   const { slug } = useParams()
@@ -16,6 +17,7 @@ const Category = () => {
   const [catProducts, setCatProducts] = useState([])
   const [selected, setSelected] = useState({}) // { key: Set<string> }
   const [openGroups, setOpenGroups] = useState({}) // { key: boolean }
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' }) // strings for inputs
 
   const FILTER_FIELDS = useMemo(() => ([
     { key: 'lensWidth', label: 'Lens Width' },
@@ -59,15 +61,26 @@ const Category = () => {
       setOpenGroups(prev => ({ ...prev, [key]: true }))
     })
     if (Object.keys(next).length) setSelected(next)
+    const pMin = params.get('priceMin')
+    const pMax = params.get('priceMax')
+    setPriceRange({
+      min: pMin !== null ? pMin : '',
+      max: pMax !== null ? pMax : '',
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search])
 
-  const syncUrl = (sel) => {
+  const syncUrl = (sel, pr = priceRange) => {
     const params = new URLSearchParams()
     Object.entries(sel).forEach(([k, set]) => {
       const arr = Array.from(set || [])
       if (arr.length) params.set(k, arr.join(','))
     })
+    // include price range if set
+    const minNum = Number(pr.min)
+    const maxNum = Number(pr.max)
+    if (!Number.isNaN(minNum) && String(pr.min).trim() !== '') params.set('priceMin', String(minNum))
+    if (!Number.isNaN(maxNum) && String(pr.max).trim() !== '') params.set('priceMax', String(maxNum))
     const search = params.toString()
     history.replace({ pathname: location.pathname, search: search ? `?${search}` : '' })
   }
@@ -129,23 +142,64 @@ const Category = () => {
   // Filter products using AND across groups and OR within a group
   const filteredProducts = useMemo(() => {
     const activeKeys = Object.keys(selected)
-    if (activeKeys.length === 0) return catProducts
-    return catProducts.filter(p => {
-      const specs = p?.frameSpecs || {}
-      for (const key of activeKeys) {
-        const val = specs?.[key]
-        if (val === undefined || val === null) return false
-        if (!selected[key].has(String(val))) return false
-      }
-      return true
-    })
-  }, [catProducts, selected])
+    const minNum = Number(priceRange.min)
+    const maxNum = Number(priceRange.max)
+    const hasMin = !Number.isNaN(minNum) && String(priceRange.min).trim() !== ''
+    const hasMax = !Number.isNaN(maxNum) && String(priceRange.max).trim() !== ''
+    const bySpecs = (arr) => {
+      if (activeKeys.length === 0) return arr
+      return arr.filter(p => {
+        const specs = p?.frameSpecs || {}
+        for (const key of activeKeys) {
+          const val = specs?.[key]
+          if (val === undefined || val === null) return false
+          if (!selected[key].has(String(val))) return false
+        }
+        return true
+      })
+    }
+    const byPrice = (arr) => {
+      if (!hasMin && !hasMax) return arr
+      return arr.filter(p => {
+        const base = Number(p?.salePrice) > 0 ? Number(p.salePrice) : Number(p?.price || 0)
+        if (Number.isNaN(base)) return false
+        if (hasMin && base < minNum) return false
+        if (hasMax && base > maxNum) return false
+        return true
+      })
+    }
+    return byPrice(bySpecs(catProducts))
+  }, [catProducts, selected, priceRange])
 
   const toggleGroup = (key) => setOpenGroups(prev => ({ ...prev, [key]: !prev[key] }))
+  const onPriceChange = (field, value) => {
+    const next = { ...priceRange, [field]: value }
+    setPriceRange(next)
+    // sync with current selected filters
+    const cleaned = Object.fromEntries(Object.entries(selected).filter(([, s]) => s && s.size))
+    syncUrl(cleaned, next)
+  }
+  const clearPrice = () => {
+    setPriceRange({ min: '', max: '' })
+    const cleaned = Object.fromEntries(Object.entries(selected).filter(([, s]) => s && s.size))
+    syncUrl(cleaned, { min: '', max: '' })
+  }
+
+  // SEO meta
+  const metaTitle = useMemo(() => {
+    return category?.metaTitle || category?.mainHeading || 'Category'
+  }, [category])
+  const metaDescription = useMemo(() => {
+    if (category?.metaDescription) return category.metaDescription
+    const stripped = String(category?.categoryDescription || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+    if (stripped) return stripped.slice(0, 160)
+    return category?.mainHeading ? `Shop ${category.mainHeading} at Glasses4U.` : 'Browse our curated eyewear collections.'
+  }, [category])
 
   return (
     <>
       <Header />
+      <MetaDecorator title={metaTitle} description={metaDescription} />
       <main>
         {/* Hero / Carousel */}
         <section className="top-bg">{category?.coverImage ? <CategoryCarousel imageUrl={category.coverImage} heading={category?.mainHeading} /> : null}</section>
@@ -157,6 +211,46 @@ const Category = () => {
             <aside className="col-12 col-lg-3 mb-4 mb-lg-0">
               <div className="card shadow-sm border-0">
                 <div className="card-body">
+                  {/* Price range */}
+                  <div className="mb-4">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <h5 className="mb-0 fw-bold">Price</h5>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-link text-decoration-none"
+                        onClick={clearPrice}
+                        disabled={loading || (String(priceRange.min).trim() === '' && String(priceRange.max).trim() === '')}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <div className="row g-2">
+                      <div className="col-6">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control"
+                          placeholder="Min"
+                          value={priceRange.min}
+                          onChange={(e) => onPriceChange('min', e.target.value)}
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="col-6">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control"
+                          placeholder="Max"
+                          value={priceRange.max}
+                          onChange={(e) => onPriceChange('max', e.target.value)}
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="d-flex align-items-center justify-content-between mb-2">
                     <h5 className="mb-0 fw-bold">Filters</h5>
                     <button

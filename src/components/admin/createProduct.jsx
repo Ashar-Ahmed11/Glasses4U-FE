@@ -35,6 +35,7 @@ export default function CreateProduct() {
     const [components, setComponents] = useState({
         namer: "",
         price: "",
+        salePrice: "",
         description: "",
         category: "",
         homePreview: false,
@@ -56,6 +57,7 @@ export default function CreateProduct() {
         const payload = {
             name: components.namer,
             price: Number(components.price || 0),
+            salePrice: Number(components.salePrice || 0),
             description: components.description,
             category: components.category,
             homePreview: components.homePreview,
@@ -110,10 +112,11 @@ export default function CreateProduct() {
         if (prodid) (async () => {
             const data = await fetchSingleProductBE(prodid)
             if (data) {
-                const { name, price, description, youtubeLink, homePreview, category, priceAED, _id, variants: vs, assets, frameSpecs } = data
+                const { name, price, salePrice, description, youtubeLink, homePreview, category, priceAED, _id, variants: vs, assets, frameSpecs } = data
                 setComponents({
                     namer: name,
                     price: price,
+                    salePrice: salePrice || '',
                     description: description,
                     youtubeLink: youtubeLink,
                     homePreview: homePreview,
@@ -168,7 +171,14 @@ export default function CreateProduct() {
                     <form>
 
                         <input value={components.namer} onChange={(e) => setComponents({ ...components, namer: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="text" placeholder='Product Name' className="form-control my-2" />
-                        <input value={components.price} onChange={(e) => setComponents({ ...components, price: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="text" placeholder='Product Price USD' className="form-control my-2" />
+                        <div className="row g-2">
+                            <div className="col-md-6">
+                                <input value={components.price} onChange={(e) => setComponents({ ...components, price: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="number" step="0.01" placeholder='Product Price USD' className="form-control my-2" />
+                            </div>
+                            <div className="col-md-6">
+                                <input value={components.salePrice} onChange={(e) => setComponents({ ...components, salePrice: e.target.value })} style={{ color: color, backgroundColor: 'white', }} type="number" step="0.01" placeholder='Sale Price USD (optional)' className="form-control my-2" />
+                            </div>
+                        </div>
                         {/* <input value={components.priceAED} onChange={(e) => setComponents({ ...components, priceAED: e.target.value })} style={{ color: color, backgroundColor: 'white',}} type="text" placeholder='Product Price AED' className="form-control my-2" /> */}
 
                         <VariantsManager variants={variants} setVariants={setVariants} />
