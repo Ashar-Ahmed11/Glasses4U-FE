@@ -17,7 +17,7 @@ const HelpCenter = () => {
     title: "ORDERING GUIDE",
     link:'/ordering-guide',
     description:
-      "Get all the info you need to place an order; be it frame size, prescription details or just the order process, this guide has them all.",
+      "This guide has everything you need to place your order, from frame sizes to prescription details to a step-by-step guidance to placing your order.",
   },
 //   {
 //     title: "EYEGLASSES SIZING INFO",
@@ -28,7 +28,7 @@ const HelpCenter = () => {
     title: "HOW TO MEASURE PD",
     link:"/pupil-distance",
     description:
-      "Don't have the PD listed on your prescription? Not to worry about it. You can measure it yourself following this simple process.",
+      "Does your prescription not include your PD? Don't worry. This simple procedure makes it easy for you to measure it yourself.",
   },
 //   {
 //     title: "FRIENDLY RETURN POLICY",
@@ -39,19 +39,19 @@ const HelpCenter = () => {
     title: "SHIPPING POLICY",
     link:"/shipping-policy",
     description:
-      "Here is all the information about our Shipping procedure that you wanted to know.",
+      "This is all the information you need about how we ship.",
   },
   {
     title: "FREQUENTLY ASKED QUESTIONS",
     link:"/faqs",
     description:
-      "You can find answers to the most frequently asked questions here.",
+      "Here, you'll find answers to the questions we get asked the most.",
   },
   {
     title: "TERMS AND CONDITIONS",
     link: "/terms",
     description:
-      "Read all the Terms & Conditions here and data security details, which ensures that your data is secure with us.",
+      "Review our complete Terms & Conditions along with our data protection policies, which guarantee that your information remains safe and secure with us.",
   },
 ];
   return (

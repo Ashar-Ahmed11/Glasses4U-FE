@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import Header from './layout/Header'
 import Footer from './layout/Footer'
 import AppContext from './context/appContext'
+import Image from "../images/blog.png"
 const slugify = (s='') => s.toString().toLowerCase().trim().replace(/[_\s]+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-')
 const Blogs = ({ title, description, showBrand }) => {
     const { posts, fetchPosts } = useContext(AppContext)
@@ -24,7 +25,8 @@ const Blogs = ({ title, description, showBrand }) => {
             <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>
           <img
-            src="http://res.cloudinary.com/dyytzksdp/image/upload/v1769627281/dpms4eeso2prubovpxpd.png?q=80&w=1600&auto=format&fit=crop"
+            // src="http://res.cloudinary.com/dyytzksdp/image/upload/v1769627281/dpms4eeso2prubovpxpd.png?q=80&w=1600&auto=format&fit=crop"
+            src={Image}
             alt="About Glasses 4U"
             className="position-absolute top-0 start-0 w-100 h-100"
             style={{ objectFit: 'cover' }}

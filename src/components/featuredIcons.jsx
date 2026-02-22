@@ -1,16 +1,19 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import Fashion from '../images/Fashion 2.png'
 
 const features = [
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-rush-delivery.svg", label: "Rush Delivery" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-kids.svg", label: "Kids" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-progressive.svg", label: "Progressives" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-featherlite.svg", label: "Zenni Featherlite™" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-blokz.svg", label: "Blokz® Blue Light" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-night-driving.svg", label: "Night Driving" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-bloomz.svg", label: "EcoBloomz™" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-safety.svg", label: "Safety" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-zunnies.svg", label: "Zunnies Sports" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-sunglasses.svg", label: "Sunglasses Guide" },
+  { img: Fashion, label: "Fashion", link:'/category/eye-glasses'},
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-rush-delivery.svg", label: "Fashion", link:'/category/eye-glasses'},
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-kids.svg", label: "Kids" },
+  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-progressive.svg", label: "Progressives" , link:'/category/eye-glasses'},
+  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-featherlite.svg", label: "Glasses 4U Exclusive" , link:'/category/eye-glasses'},
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-blokz.svg", label: "Blokz® Blue Light" },
+  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-night-driving.svg", label: "Night Driving" , link:'/category/eye-glasses'},
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-bloomz.svg", label: "EcoBloomz™" },
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-safety.svg", label: "Safety" },
+  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-zunnies.svg", label: "Sports" , link:'/category/eye-glasses'},
+  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-sunglasses.svg", label: "Sunglasses" , link:'/category/eye-glasses'},
 ];
 
 const FeatureIconsRow = () => {
@@ -21,6 +24,7 @@ const FeatureIconsRow = () => {
       <div className="row justify-content-center text-center">
         {features.map((item, index) => (
           <div key={index} className="col-3 col-sm-4 col-md-1  mb-4">
+            <Link to={item.link} style={{ textDecoration: "none", color: "inherit" }}>
             <div
               className="d-flex flex-column align-items-center"
               style={{ cursor: "pointer" }}
@@ -39,8 +43,9 @@ const FeatureIconsRow = () => {
                   style={{ width: "40px", height: "40px", objectFit: "contain" }}
                 />
               </div>
-              <small className="fw-bold">{item.label}</small>
+              <small className="fw-bold" style={{color:'black', textDecoration:'none'}}>{item.label}</small>
             </div>
+          </Link>
           </div>
         ))}
       </div>
