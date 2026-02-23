@@ -1,6 +1,6 @@
 import React from "react";
 import "./CuratedStyleHero.css";
-
+import { Link } from "react-router-dom";
 const SecHero = () => {
     return (
         <section className="curated-hero top-bg">
@@ -13,7 +13,9 @@ const SecHero = () => {
                 <p className="subtitle">
                     Discover our selection of stylish frames curated for fashion, comfort, and everyday wear.
                 </p>
-                <button className="shop-btn">Shop now</button>
+                <Link to="/category/eye-glasses">
+                    <button className="shop-btn">Shop now</button>
+                </Link>
             </div>
 
             {/* right people / images */}

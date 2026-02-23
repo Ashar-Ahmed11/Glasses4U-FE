@@ -25,7 +25,7 @@ export const heroSlides = [
     },
 
     {
-        title: 'EYEQLENZ™ WITH ZENNI ID GUARD™',
+        title: 'THE BEST FRAMES NATIONWIDE',
         subtitle: 'Infrared, UV, and blue light protection.',
         imageUrl: 'https://res.cloudinary.com/dextrzp2q/image/fetch/f_webp/q_60/https://sunglassstation.co.uk/cdn/shop/files/2408m1.jpg?v=1751280054&width=533',
         cta: { label: 'Shop now', href: '/category/eye-glasses' }
@@ -36,32 +36,32 @@ export const featuredSlides = [
         title: 'FRAMES THAT FLOAT ON AIR',
         subtitle: 'Glasses 4U',
         imageUrl: 'https://res.cloudinary.com/dextrzp2q/image/fetch/f_webp/q_60/https://i.shgcdn.com/e02094b0-e851-4df8-937a-514c2139f2ee/-/format/auto/-/preview/3000x3000/-/quality/lighter/',
-        cta: { label: 'Shop now', href: 'eye-glasses' }
+        cta: { label: 'Shop now', href: '/category/eye-glasses' }
     },
     {
         title: 'NIGHT DRIVING CONFIDENCE',
         subtitle: 'Reduce glare for sharper vision at night.',
         imageUrl: 'https://res.cloudinary.com/dextrzp2q/image/fetch/f_webp/q_60/https://ardoreyewear.co.uk/cdn/shop/articles/top-mens-sunglasses-trends-for-2025-style-meets-functionality-in-the-uk-516493_c68e81e9-f8fe-4fa3-96fa-b1fe5b2fdb36-598077.jpg?v=1741255021',
-        cta: { label: 'Shop now', href: 'eye-glasses' }
+        cta: { label: 'Shop now', href: '/category/eye-glasses' }
     },
     
     {
         title: 'FRAMES THAT FLOAT ON AIR',
         subtitle: 'Glasses 4U',
         imageUrl: 'http://res.cloudinary.com/dyytzksdp/image/upload/v1769626419/bv2pcbl2txbuz1riyrjf.png',
-        cta: { label: 'Shop now', href: 'eye-glasses' }
+        cta: { label: 'Shop now', href: '/category/eye-glasses' }
     },
     {
         title: 'NIGHT DRIVING CONFIDENCE',
         subtitle: 'Reduce glare for sharper vision at night.',
         imageUrl: 'http://res.cloudinary.com/dyytzksdp/image/upload/v1769626542/jwayswnnbh3m7llhhyfa.png',
-        cta: { label: 'Shop now', href: 'eye-glasses' }
+        cta: { label: 'Shop now', href: '/category/eye-glasses' }
     },
      {
         title: 'FRAMES THAT FLOAT ON AIR',
         subtitle: 'Glasses 4U',
         imageUrl: 'http://res.cloudinary.com/dyytzksdp/image/upload/v1769626584/xvxlo9szqlha4l7nd6ck.png',
-        cta: { label: 'Shop now', href: 'eye-glasses' }
+        cta: { label: 'Shop now', href: '/category/eye-glasses' }
     },
     
 ];

@@ -20,7 +20,7 @@ const PromoDuo = () => (
                 <PromoCard
                     subtitle="GRATEFUL FOR"
                     title={"THE GOOD WE SEE"}
-                    cta={{ label: 'Shop now' }}
+                    cta={{ label: 'Shop now', href: '/category/eye-glasses' }}
                     imageUrl="https://t3.ftcdn.net/jpg/05/48/91/46/360_F_548914614_nu3JSogx41lxFDZGsVLMGQpqZ02KNvNg.jpg"
                 />
             </div>
@@ -28,7 +28,7 @@ const PromoDuo = () => (
                 <PromoCard
                     subtitle="EYEWEAR FOR"
                     title={"EVERYONE™"}
-                    cta={{ label: 'Shop now' }}
+                    cta={{ label: 'Shop now', href: '/category/eye-glasses' }}
                     imageUrl="https://img.freepik.com/free-photo/close-up-outdoor-photo-carefree-man-stylish-dark-clothes-posing-near-old-building-handsome-african-guy-standing-front-yellow-wall_197531-21784.jpg?semt=ais_hybrid&w=740&q=80"
                 />
             </div>
