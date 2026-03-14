@@ -8,94 +8,95 @@ const faqs = [
   {
     question: "Why are your prices so low?",
     answer:
-      "We keep costs down by avoiding expensive showrooms and heavy advertising. Instead of running a large eye glass store near me setup, we operate online — which means lower overhead and better prices for you. Our cheap eye glasses are affordable without compromising quality. Every frame and lens goes through strict quality checks before reaching you.",
+      "Our prices remain low since we operate online and so the price of physical stores, rent and advertising is minimized. This enables us to transfer our savings to our customers without sacrificing quality. Each frame and lens is carefully checked in quality prior to shipment. We will be able to offer trendy and high-quality eyeglasses at reasonable costs by reducing extra costs. We have a mission to ensure that quality eyewear is affordable to all and at the same time we are willing to be of high quality.",
   },
   {
     question: "How do I place an order?",
     answer:
-      "Simply select a frame as per your size. Enter in your prescription. Pick the lenses from the options available. Add them to the cart and proceed with the payment.",
+      "It is fast and easy to place an order. Select a frame that matches your face and style and gets a pair of them. You just need to fill your prescription and select the type of lens you require and the kinds of coatings. Add the glasses to the cart, checkout, and make a safe payment. Upon confirmation, your order will be converted and delivered in time thus a hassle free experience both in choosing and delivery.",
   },
   {
     question: "How do I use a promo code?",
     answer:
-      'Add your selected eye glasses frames to the cart. Enter your discount code in the "Promo Code" box. Click Apply and watch your total drop instantly. Note: Only one promo code can be used per order.',
+      "In order to apply a promo code, add glasses of your desired items in your shopping cart. When checking out, you should find a place that says Promo Code and enter your code and then click Apply. The discount will be computed at once in your total. It is necessary to note that in most cases, there is only one promo code per order. Promotional codes will help in saving money when purchasing products and we do have frequent promotions on products during seasons.",
   },
   {
     question: "Why is frame size important?",
     answer:
-      "Choosing the correct size ensures accurate pupil distance alignment and clear vision. While style matters — especially for trendy cat eye glasses — proper fit is essential for focus and comfort.",
+      "Getting the right frame size would help in making sure that your glasses fit in the right manner and that the pupils fit in the right way too. A properly fitted frame will give a clear vision, avoid slipping and will not cause any discomfort. The misplaced frames may lead to headaches, blurred vision or the pressure that can be experienced on the nose and ears. The correct size of the frame also improves the overall look of your glasses as they are useful and aesthetic.",
   },
   {
     question: "I don't see the lenses I need. What should I do?",
     answer:
-      "Once you enter your prescription, our system shows compatible lens options. If nothing appears, it means we currently don't stock lenses for that prescription. Contact our support team — we may be able to arrange a special request.",
+      "In case you are unable to locate the necessary lenses on our site, our customer care department is within your service. You may contact us through telephone, email or chat to talk about your needs. We are able to offer substitute choices in most situations or take you through the process of ordering of lenses which are custom made. We aim at making sure that you are not compromised when it comes to lenses that are in accordance with your prescription, preferences and the lifestyle needs.",
   },
   {
     question: "Can I use my contact lens prescription?",
     answer:
-      "No. A contact lens prescription cannot be used to produce eye glasses. You'll need a valid eyeglasses prescription.",
+      "No, contact lens prescriptions are different from eyeglass prescriptions and they cannot be used interchangeably. Eyeglass lenses are positioned a little distance in front of your eyes thus varying the needed lens power as compared to contact lenses. It is always advisable to order glasses online with a valid eyeglass prescription. In case you are not sure, your optometrist can assist you to get the proper measurements to get the best vision correction.",
   },
   {
     question: "How do I order prescription sunglasses?",
     answer:
-      "Simply select tinted lenses (permanent color) or photochromic lenses (darken in sunlight automatically). Now your regular eye glasses become stylish sunglasses.",
+      "The procedure of getting prescription sunglasses is easy and it has the same process as ordinary glasses. Select the frame to be used with the sunglasses, your prescription and the tint of the lenses to use and the UV block. Additional options of coating such as anti-reflective or blue light protection can also be selected. This will not only keep your sunglasses fashionable but will also give them the best vision correction not to mention their ability to shield your eyes against the sun.",
   },
   {
     question: "What are your lenses made of?",
     answer:
-      "All lenses are made from lightweight, durable plastic and finished with scratch-resistant coating. Each lens passes multiple quality inspections before being customized to your prescription. We currently offer plastic lenses only (up to index 1.67).",
+      "We use optical grade materials that are of superior quality to manufacture lenses that offer clear and accurate perception. These are light, durable and impact-resistant materials to be worn on daily basis. A number of our optic lenses incorporate highly developed plastics which have better resistance to scratches and comfort than the old fashioned glass lenses. They are not only safe, but also designed to last a long time too, so that your eyewear can be reliable and functional.",
   },
   {
     question: "What lens coatings do you offer?",
     answer:
-      "All our eye glasses come with UV protection and scratch resistance by default. Additional options include: Anti-Reflective Coating – Ideal for night driving and screen use. Blue Light Protection – Reduces harmful blue light exposure. Hydrophobic Coating – Repels water and dirt. UV Protection – Blocks 100% UVA & UVB rays.",
+      "We do provide various lens coating to increase durability, comfort, and performance. There are the anti-reflective coating to reduce the glare, scratches-free coating to eliminate breakages, UV protection to save your eyes against adverse rays, and filtering of the blue light use on the screens. There are also some lenses with photochromic properties that automatically adjust to the sunlight. These finishes enhance the general wearing experience and your eyes are also secure in various settings.",
   },
   {
     question: "Do you offer prism correction?",
     answer:
-      "Yes. Prism correction is available up to base 5. Additional charges apply depending on your prescription.",
+      "Yes, some prescriptions can be corrected by prism, and it can be helpful to those that have problems with alignment in their eyes or with seeing two images. Prism lenses assist in correcting the way in which the light enters your eyes so that it can be correctly aligned and is comfortable to see. We also have support team which you can call to seek advice before placing an order to ensure that prism lenses can be used on your glasses.",
   },
   {
     question: "Do you charge extra for strong prescriptions?",
     answer:
-      "Yes, additional charges may apply for strong prescriptions. The cost will automatically update after entering your prescription details.",
+      "In some cases, very strong prescriptions might need special lenses or extra processing which might be charged a little extra. This makes the lenses clear, durable, and comfortable and has maintained good vision correction. It also shows any extra charge at the checkout. Our mission is to offer low-cost eyewear that does not compromise on the quality and performance of the lenses provided to the consumers.",
   },
   {
     question: "Can I pick up my glasses?",
     answer:
-      "No. Glasses 4 U operates fully online. That's how we keep our cheap eye glasses prices low — no physical store needed.",
+      "To ensure the ease of getting our orders, most of our orders are usually delivered to your doorstep, although there are pickup options, based on the availability of a local shop or a collection centre. In case of pickup, then you can choose it in checkout. We make sure that every glass will be packed well so that it is not damaged during transportation. Such flexibility would enable customers to get their eyewears in the most convenient manner possible.",
   },
   {
     question: "Where are my glasses made?",
     answer:
-      "Our production facilities are located in Thailand and Pakistan. Orders are shipped from the available production center based on stock.",
+      "The glasses we produce are of high quality and made through the latest production methods. Frames and lenses can be made in special factories which deal with optical production. The quality of every product is thoroughly checked during the shipping process. This guarantees that you get a long lasting eyewear that is of professional standards.",
   },
   {
     question: "Do you offer international shipping?",
     answer:
-      "Yes, we ship worldwide. Shipping costs vary by location. US Standard Shipping: $5.95 per pair. US Priority Shipping: $9.95. Additional pair: $2 extra. International rates: Contact support. Custom duties may apply outside the US, UK, and Canada depending on local laws.",
+      "Yes, international shipping can be offered to the customers of numerous countries. Delivery time and expenses may be different with respect to the destination and mode of delivery adopted. When it comes to the checkout, you are going to be able to see if your location is supported. Our mission is to deliver in a safe and reliable manner across the world.",
   },
   {
     question: "After placing an order, will I get a tracking number?",
     answer:
-      "Yes of course. Once your eye glasses are shipped, you'll receive a tracking number via email and in your account.",
+      "Yes, after processing your order and a shipment has been made, you will get an email with a tracking number. This tracking number will enable you track your shipment online. The tracking system of the courier will allow you to see the status of the delivery at any point in time. This will keep you fully informed on the delivery date of your glasses.",
   },
   {
     question: "Is payment secure?",
     answer:
-      "Absolutely. We accept major credit cards, PayPal, Amazon Pay, and Apple Pay. All payments are securely processed. We do not store card details.",
+      "Yes, any payments that are made in our site are made using secure payment gateways. These systems have an encryption technology that safeguards your personal and financial data. We do not keep sensitive details of payment in our servers. This makes all the transactions safe and confidential.",
   },
   {
     question: "Do glasses come with original cases?",
     answer:
-      "Not always. Some designer brands may not include original cases due to bulk purchasing. However, every order includes a protective Glasses 4 U case.",
+      "Yes, the majority of eyeglasses come with a protective case to ensure the eyeglasses are not damaged when not in use. The situation is useful to avoid scratches, dust, and unintentional damages. A cleaning cloth can also be in most occasions attached to assist in keeping the lenses clear. These are the accessories that assist you in caring better about your eyewear.",
   },
   {
     question: "Can I cancel or change my order?",
     answer:
-      "Yes — contact us within 24 hours of placing your order. We process orders quickly, so early communication is important.",
+      "Orders may in most cases be canceled or changed within a very short period after the order is made as far as production is not processed. In case you have to change something, it is best to contact the customer support as early as possible with your order details. When the lenses are already manufactured or the order is shipped the change might not be possible anymore. Our team will take you through the available options.",
   },
 ]
+
 
 const Faqs = () => {
   const [openIndex, setOpenIndex] = useState(0)
