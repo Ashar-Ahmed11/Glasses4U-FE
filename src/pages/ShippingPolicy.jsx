@@ -10,7 +10,7 @@ const ShippingPolicy = () => {
       <Header />
       <MetaDecorator title="Shipping Policy | Glasses 4U" description="Learn about our shipping timelines, methods, charges, and return policies." />
 
-        <section className="position-relative">
+      <section className="position-relative">
         <div className="w-100" style={{ paddingBottom: window.innerWidth > 750 ? '52.941%' : '133.3%' }}>
           <img
             src={Coverimg}
@@ -21,7 +21,7 @@ const ShippingPolicy = () => {
         </div>
         <div className="shade w-100 h-100" style={{ zIndex: 20, position: 'absolute', inset: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', zIndex: 10 }} />
-        <div style={{zIndex:30}} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
+        <div style={{ zIndex: 30 }} className="position-absolute top-50 start-50 translate-middle text-center text-white px-3">
           <h1 className="display-4 fw-bold">Shipping Policy</h1>
           {/* <p className="lead">Crafting prescription eyewear designed for comfort, clarity, and modern style.
  At Glasses 4U, we believe great vision should be easy, affordable, and effortless. That’s why we create high-quality prescription eyewear that helps you see clearly and feel confident every single day.
@@ -79,10 +79,10 @@ const ShippingPolicy = () => {
             </p>
 
             {/* Our Shipping Methods */}
-            <h6 className="fw-bold text-center mb-2">OUR SHIPPING METHODS</h6>
+            {/* <h6 className="fw-bold text-center mb-2">OUR SHIPPING METHODS</h6>
             <p className="mb-1">- For Standard Shipping to the US &amp; Puerto Rico, we use USPS (United States Postal Services)</p>
             <p className="mb-1">- For Standard Shipping to UK, Ireland, and France, we use Royal Mail.</p>
-            <p className="mb-4">- For Standard Shipping to Canada, we use Canada Post.</p>
+            <p className="mb-4">- For Standard Shipping to Canada, we use Canada Post.</p> */}
 
             {/* Return Policy */}
             <h6 className="fw-bold text-center mb-2">RETURN, EXCHANGE &amp; REPLACEMENT POLICY</h6>
