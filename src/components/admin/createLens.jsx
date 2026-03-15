@@ -8,15 +8,15 @@ const LENS_TYPES = ['Clear Lenses','Photochromic - Dark in Sun','Sunglasses']
 export default function CreateLens() {
   const { lensid } = useParams()
   const history = useHistory()
-  const { createLens, editLens, fetchLensById, deleteLens } = useContext(AppContext)
-  const [form, setForm] = useState({ title: '', description: '', price: '', thickness: '', rxType: RX_TYPES[0], lensType: LENS_TYPES[0] })
+  const { createLens, editLens, fetchLensById, deleteLens, uploadImage } = useContext(AppContext)
+  const [form, setForm] = useState({ title: '', description: '', price: '', thickness: '', rxType: RX_TYPES[0], lensType: LENS_TYPES[0], image: '' })
   useEffect(() => {
     const token = localStorage.getItem('auth-token')
     if (!token) return history.push('/admin')
     ;(async () => {
       if (lensid) {
         const d = await fetchLensById(lensid)
-        if (d) setForm({ title: d.title||'', description: d.description||'', price: d.price||'', thickness: d.thickness||'', rxType: d.rxType||RX_TYPES[0], lensType: d.lensType||LENS_TYPES[0] })
+        if (d) setForm({ title: d.title||'', description: d.description||'', price: d.price||'', thickness: d.thickness||'', rxType: d.rxType||RX_TYPES[0], lensType: d.lensType||LENS_TYPES[0], image: d.image || '' })
       }
     })()
   }, [lensid])
@@ -33,6 +33,15 @@ export default function CreateLens() {
       <form className="mt-3" onSubmit={onSubmit}>
         <input className="form-control mb-2" placeholder="Title" value={form.title} onChange={(e)=>setForm({ ...form, title: e.target.value })} />
         <textarea className="form-control mb-2" placeholder="Description" value={form.description} onChange={(e)=>setForm({ ...form, description: e.target.value })} />
+        <div className="mb-2">
+          <div className="input-group">
+            <input className="form-control" placeholder="Image URL (optional)" value={form.image} onChange={(e)=>setForm({ ...form, image: e.target.value })} />
+            <label className="btn btn-outline-dark mb-0">
+              Upload <input type="file" accept="image/*" className="d-none" onChange={async (e)=>{ const f=e.target.files?.[0]; if(!f) return; const url=await uploadImage(f); setForm((prev)=>({ ...prev, image: url })) }} />
+            </label>
+          </div>
+          {form.image && <img src={form.image} alt="lens" className="img-fluid mt-2 rounded" style={{ maxHeight: 140, objectFit: 'cover' }} />}
+        </div>
         <div className="row g-2">
           <div className="col-md-6"><input type="number" className="form-control mb-2" placeholder="Price" value={form.price} onChange={(e)=>setForm({ ...form, price: e.target.value })} /></div>
           <div className="col-md-6"><input type="number" className="form-control mb-2" placeholder="Thickness" value={form.thickness} onChange={(e)=>setForm({ ...form, thickness: e.target.value })} /></div>

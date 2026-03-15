@@ -34,6 +34,12 @@ const Footer = () => {
               <li><Link className="text-decoration-none" to="/terms">Terms & Conditions</Link></li>
             </ul>
           </div>
+          <div className="col-6 col-md">
+            <div className="fw-semibold mb-2">Other Links</div>
+            <ul className="list-unstyled small m-0">
+              <li><Link className="text-decoration-none" to="/blogs">Blogs</Link></li>
+            </ul>
+          </div>
         </div>
         <div className="small text-muted mt-4 px-4">© 2025 Glasses 4U</div>
       </div>

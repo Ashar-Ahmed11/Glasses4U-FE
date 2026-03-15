@@ -793,8 +793,12 @@ const PrescriptionModal = ({ onComplete }) => {
                           <div className="fw-bold mb-2 text-center">{heading}</div>
                           <hr className="my-3" />
                           <div className="d-flex align-items-center gap-3">
-                            <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 80, height: 80 }}>
-                              <span className="fs-3">🥽</span>
+                            <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center overflow-hidden" style={item?.image ? {} : { width: 80, height: 80 }}>
+                              {item?.image ? (
+                                <img src={item.image} alt={item.title || 'Lens'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                              ) : (
+                                <span className="fs-3">🥽</span>
+                              )}
                             </div>
                             <p className="mb-0 text-muted">{item.description}</p>
                           </div>

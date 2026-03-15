@@ -33,7 +33,7 @@ export default function Checkout() {
 
 
     const history = useHistory()
-    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken, sendOrderEmail, lookupDiscountCode } = useContext(AppContext)
+    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken, sendOrderEmail, lookupDiscountCode, appliedDiscount, applyDiscount, clearDiscount } = useContext(AppContext)
     const [checkoutLoader, setCheckoutLoader] = useState(false)
     const [rxItem, setRxItem] = useState(null)
     const RX_LABEL = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
@@ -80,11 +80,10 @@ export default function Checkout() {
 
     const totalCal = cart.reduce((s, i) => s + i.price * i.quantity, 0)
     const [discountCode, setDiscountCode] = useState('')
-    const [appliedDiscount, setAppliedDiscount] = useState({ code: '', pct: 0 })
     const [applying, setApplying] = useState(false)
 
     const delivery = Number(basicInfo?.deliveryCharges || 0)
-    const subtotal = Math.max(0, totalCal * (1 - (Number(appliedDiscount.pct || 0) / 100)))
+    const subtotal = Math.max(0, totalCal * (1 - (Number(appliedDiscount?.pct || 0) / 100)))
     const total = subtotal + delivery
 
     const theSubtotal = total.toLocaleString('en-US', {
@@ -174,15 +173,15 @@ export default function Checkout() {
                           disabled={applying}
                           onClick={async () => {
                             const code = String(discountCode || '').trim()
-                            if (!code) { setAppliedDiscount({ code:'', pct:0 }); return }
+                            if (!code) { clearDiscount(); return }
                             setApplying(true)
                             try {
                               const found = await lookupDiscountCode(code)
                               if (found && typeof found.discountPercentage === 'number') {
-                                setAppliedDiscount({ code: found.discountCodeName, pct: Number(found.discountPercentage) })
+                                applyDiscount(found.discountCodeName, Number(found.discountPercentage))
                                 toast.success('Discount code applied')
                               } else {
-                                setAppliedDiscount({ code:'', pct:0 })
+                                clearDiscount()
                                 toast.error('Invalid discount code')
                               }
                             } finally {
@@ -195,7 +194,16 @@ export default function Checkout() {
                         </button>
                     </div>
                     {appliedDiscount.code && (
-                      <div className="small text-success mt-1">Applied {appliedDiscount.code} (-{Number(appliedDiscount.pct).toFixed(0)}%)</div>
+                      <div className="small mt-1 d-flex align-items-center gap-2">
+                        <span className="text-success">Applied {appliedDiscount.code} (-{Number(appliedDiscount.pct || 0).toFixed(0)}%)</span>
+                        <button
+                          type="button"
+                          className="btn btn-link btn-sm text-danger p-0"
+                          onClick={() => { clearDiscount(); setDiscountCode('') }}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     )}
                 </div>
                 <div className='container-fluid my-3'>

@@ -3,11 +3,15 @@ import CartItem from './cartItem'
 import { Link } from 'react-router-dom'
 import AppContext from './context/appContext'
 import { useHistory } from 'react-router-dom'
+import { toast } from 'react-toastify'
 export default function Cart() {
-  const { cart } = useContext(AppContext)
+  const { cart, lookupDiscountCode, appliedDiscount, applyDiscount, clearDiscount } = useContext(AppContext)
   const color = '#212427'
   const history = useHistory()
   const subtotal = cart.reduce((sum, i) => sum + i.quantity * i.price, 0)
+  const [discountCode, setDiscountCode] = useState('')
+  const [applying, setApplying] = useState(false)
+  const discountedSubtotal = Math.max(0, subtotal * (1 - (Number(appliedDiscount?.pct || 0) / 100)))
   const fmt = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 
   console.log(cart)
@@ -34,10 +38,60 @@ export default function Cart() {
           </div>
         </div>
         <div className="offcanvas-footer p-3" style={{ borderTop: `1px solid ${color}` }}>
+        <div className="mx-2 my-2">
+            <div className="d-flex gap-2">
+              <input
+                value={discountCode}
+                onChange={(e)=>setDiscountCode(e.target.value)}
+                placeholder="Discount code"
+                className="form-control form-control-sm"
+                style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }}
+              />
+              <button
+                type="button"
+                className="btn btn-outline-dark btn-sm d-inline-flex align-items-center gap-2"
+                disabled={applying}
+                onClick={async () => {
+                  const code = String(discountCode || '').trim()
+                  if (!code) { clearDiscount(); return }
+                  setApplying(true)
+                  try {
+                    const found = await lookupDiscountCode(code)
+                    if (found && typeof found.discountPercentage === 'number') {
+                      applyDiscount(found.discountCodeName, Number(found.discountPercentage))
+                      toast.success('Discount code applied')
+                    } else {
+                      clearDiscount()
+                      toast.error('Invalid discount code')
+                    }
+                  } finally {
+                    setApplying(false)
+                  }
+                }}
+              >
+                {applying && (<span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>)}
+                {applying ? 'Applying...' : 'Apply'}
+              </button>
+            </div>
+            {appliedDiscount.code && (
+              <div className="small mt-1 d-flex align-items-center gap-2">
+                <span className="text-success">Applied {appliedDiscount.code} (-{Number(appliedDiscount.pct || 0).toFixed(0)}%)</span>
+                <button
+                  type="button"
+                  className="btn btn-link btn-sm text-danger p-0"
+                  onClick={() => { clearDiscount(); setDiscountCode('') }}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
           <div className="row mx-2">
             <div style={{ color }} className="col-6"><p>SUBTOTAL</p></div>
-            <div style={{ color, textAlign: 'end' }} className="col-6"><p>{fmt(subtotal)}</p></div>
+            <div style={{ color, textAlign: 'end' }} className="col-6"><p>{fmt(discountedSubtotal)}</p></div>
           </div>
+          {/* Discount code input */}
+          
           {subtotal > 0 && (
             <div className="d-flex">
               <button onClick={() => history.push('/checkout')} className="btn top-bg text-white" data-bs-dismiss="offcanvas" style={{  width: '100%' }}>Check Out</button>

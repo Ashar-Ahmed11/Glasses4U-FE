@@ -28,9 +28,18 @@ export default function Eyewear() {
               <div key={l._id} className="col-12">
                 <div className="card border-0 shadow-sm p-3">
                   <div className="d-flex align-items-center justify-content-between">
-                    <div>
-                      <h6 className="mb-1">{l.title}</h6>
-                      <div className="text-muted small">{l.rxType} • {l.lensType} • ${Number(l.price || 0).toFixed(2)}</div>
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="rounded border bg-light d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 56, height: 56 }}>
+                        {l.image ? (
+                          <img src={l.image} alt={l.title || 'Lens'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span role="img" aria-label="lens" style={{ fontSize: 22 }}>🥽</span>
+                        )}
+                      </div>
+                      <div>
+                        <h6 className="mb-1">{l.title}</h6>
+                        <div className="text-muted small">{l.rxType} • {l.lensType} • ${Number(l.price || 0).toFixed(2)}</div>
+                      </div>
                     </div>
                     <div className="d-flex gap-2">
                       <Link to={`/dashboard/create-lens/${l._id}`} className="btn btn-outline-dark btn-sm">Edit</Link>

@@ -106,6 +106,7 @@ const AppState = (props) => {
   const [lenses, setLenses] = useState([])
   const [globalLoader, setGlobalLoader] = useState(false)
   const [posts, setPosts] = useState([])
+  const [appliedDiscount, setAppliedDiscount] = useLocalStorage('appliedDiscount', { code: '', pct: 0 })
   const [discountCodes, setDiscountCodes] = useState([])
 
   // helper to extract validator / server errors nicely
@@ -576,6 +577,10 @@ const AppState = (props) => {
     toast.info('Discount code deleted')
     return true
   }
+
+  // Applied discount (global)
+  const applyDiscount = (code, pct) => setAppliedDiscount({ code: String(code || ''), pct: Number(pct || 0) })
+  const clearDiscount = () => setAppliedDiscount({ code: '', pct: 0 })
   const fetchLensById = async (id) => {
     const res = await fetch(`${API_BASE}/api/lenses/${id}`)
     return await res.json()
@@ -717,7 +722,7 @@ const AppState = (props) => {
   }
 
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, discountCodes, fetchDiscountCodes, fetchDiscountCodeById, lookupDiscountCode, createDiscountCode, editDiscountCode, deleteDiscountCode, globalLoader, setGlobalLoader }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, discountCodes, fetchDiscountCodes, fetchDiscountCodeById, lookupDiscountCode, createDiscountCode, editDiscountCode, deleteDiscountCode, appliedDiscount, applyDiscount, clearDiscount, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )
