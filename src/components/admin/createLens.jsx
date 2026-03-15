@@ -3,7 +3,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import AppContext from '../context/appContext'
 
 const RX_TYPES = ['Distance','Reading','Bifocal with line','Progressive (no line)']
-const LENS_TYPES = ['Clear Lenses','Photochromic - Dark in Sun']
+const LENS_TYPES = ['Clear Lenses','Photochromic - Dark in Sun','Sunglasses']
 
 export default function CreateLens() {
   const { lensid } = useParams()

@@ -4,6 +4,7 @@ import Img1 from '../images/1.png'
 import Img2 from '../images/2.png'
 import Img3 from '../images/3.png'
 import Img4 from '../images/4.png'
+import { toast } from 'react-toastify'
 
 // Tints catalog for Sunglasses (Always Dark)
 const TINTS = [
@@ -94,9 +95,14 @@ const addValues = range(0.75, 3.5, 0.25) // +0.75 … +3.50
 const axisValues = Array.from({ length: 181 }, (_, i) => i) // 0 … 180
 const pdValues = range(54, 74, 1) // 54 … 74 (binocular PD)
 const pdMonoValues = range(25, 40, 0.5) // 25.0 … 40.0 (monocular PD)
+const prismValues = [
+  '5.00','4.75','4.50','4.25','4.00','3.75','3.50','3.25','3.00',
+  '2.75','2.50','2.25','2.00','1.75','1.50','1.25','1.00','0.75','0.50','0.25','None'
+]
 
-const Select = ({ values, value, onChange, sign = false, decimals = 2 }) => (
-  <select className="form-select" value={value} onChange={onChange}>
+const Select = ({ values, value, onChange, sign = false, decimals = 2, className = '', style }) => (
+  <select className={`form-select ${className}`} style={style} value={value} onChange={onChange}>
+    <option value="">{'Select'}</option>
     {values.map((v) => (
       <option key={v} value={v}>
         {typeof v === 'number' ? toLabel(v, { sign, decimals }) : v}
@@ -109,20 +115,26 @@ const PrescriptionModal = ({ onComplete }) => {
   const { lenses, fetchLenses, basicInfo, getBasicInfo } = React.useContext(AppContext)
   const INITIAL_FORM = {
     // OD (Right)
-    od_sph: -1.0,
-    od_cyl: -1.5,
-    od_axis: 3,
-    od_add: 3.25,
+    od_sph: '',
+    od_cyl: '',
+    od_axis: '',
+    od_add: '',
     // OS (Left)
-    os_sph: -2.5,
-    os_cyl: -2.25,
-    os_axis: 76,
-    os_add: 3.25,
+    os_sph: '',
+    os_cyl: '',
+    os_axis: '',
+    os_add: '',
     // PD + name
-    pd: 69, // single PD (binocular)
-    right_pd: 31.5,
-    left_pd: 31.5,
+    pd: '', // single PD (binocular)
+    right_pd: '',
+    left_pd: '',
     name: '',
+    // Prism
+    prismEnabled: false,
+    od_prism_ver: '',
+    od_prism_ver_dir: '',
+    os_prism_ver: '',
+    os_prism_ver_dir: '',
   }
   const [form, setForm] = React.useState(INITIAL_FORM)
   const [hasTwoPD, setHasTwoPD] = React.useState(false)
@@ -176,15 +188,15 @@ const PrescriptionModal = ({ onComplete }) => {
   const lastQueryRef = React.useRef('')
   React.useEffect(() => {
     const RX_MAP = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
-    const LT_MAP = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun', sunglasses: 'Clear Lenses' } // treat sunglasses as clear
+    const LT_MAP = { clear: 'Clear Lenses', photochromic: 'Photochromic - Dark in Sun', sunglasses: 'Sunglasses' }
     if (step === 4 && rxType && lensType) {
       const queryKey = `${rxType}|${lensType}`
       if (lastQueryRef.current !== queryKey) {
         lastQueryRef.current = queryKey
-        ;(async () => {
-          try { setLoading(true); await fetchLenses({ rxType: RX_MAP[rxType], lensType: LT_MAP[lensType] }) }
-          finally { setLoading(false) }
-        })()
+          ; (async () => {
+            try { setLoading(true); await fetchLenses({ rxType: RX_MAP[rxType], lensType: LT_MAP[lensType] }) }
+            finally { setLoading(false) }
+          })()
       }
     }
   }, [step, rxType, lensType])
@@ -198,7 +210,7 @@ const PrescriptionModal = ({ onComplete }) => {
     return () => el.removeEventListener('hidden.bs.modal', handler)
   }, [resetAll])
 
-    return (
+  return (
     <div
       data-bs-backdrop="static"
       data-bs-keyboard="false"
@@ -245,7 +257,27 @@ const PrescriptionModal = ({ onComplete }) => {
             )}
             {step === 1 && (
               <>
-                <h3 className="mb-4">Step 1 - Prescription</h3>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h3 className="mb-0">Step 1 - Prescription</h3>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => {
+                      setForm((prev) => ({
+                        ...prev,
+                        od_sph: '', od_cyl: '', od_axis: '', od_add: '',
+                        os_sph: '', os_cyl: '', os_axis: '', os_add: '',
+                        pd: '', right_pd: '', left_pd: '',
+                        prismEnabled: false,
+                        od_prism_ver: '', od_prism_ver_dir: '',
+                        os_prism_ver: '', os_prism_ver_dir: '',
+                      }))
+                      setHasTwoPD(false)
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
                 {/* Desktop layout (original) */}
                 <div className="d-none d-md-block">
                   <div className="row g-3">
@@ -271,10 +303,10 @@ const PrescriptionModal = ({ onComplete }) => {
                               <Select values={cylValues} value={form.od_cyl} onChange={(e) => setForm({ ...form, od_cyl: parseFloat(e.target.value) })} sign />
                             </div>
                             <div className="col-2">
-                              <Select values={axisValues} value={form.od_axis} onChange={(e) => setForm({ ...form, od_axis: parseInt(e.target.value, 10) })} decimals={0} />
+                              <Select className="py-2 px-2" values={axisValues} value={form.od_axis} onChange={(e) => setForm({ ...form, od_axis: parseInt(e.target.value, 10) })} decimals={0} />
                             </div>
                             <div className="col-2">
-                              <Select values={addValues} value={form.od_add} onChange={(e) => setForm({ ...form, od_add: parseFloat(e.target.value) })} sign />
+                              <Select className="py-2 px-2" values={addValues} value={form.od_add} onChange={(e) => setForm({ ...form, od_add: parseFloat(e.target.value) })} sign />
                             </div>
                           </div>
                         </div>
@@ -289,10 +321,10 @@ const PrescriptionModal = ({ onComplete }) => {
                               <Select values={cylValues} value={form.os_cyl} onChange={(e) => setForm({ ...form, os_cyl: parseFloat(e.target.value) })} sign />
                             </div>
                             <div className="col-2">
-                              <Select values={axisValues} value={form.os_axis} onChange={(e) => setForm({ ...form, os_axis: parseInt(e.target.value, 10) })} decimals={0} />
+                              <Select className="py-2 px-2" values={axisValues} value={form.os_axis} onChange={(e) => setForm({ ...form, os_axis: parseInt(e.target.value, 10) })} decimals={0} />
                             </div>
                             <div className="col-2">
-                              <Select values={addValues} value={form.os_add} onChange={(e) => setForm({ ...form, os_add: parseFloat(e.target.value) })} sign />
+                              <Select className="py-2 px-2" values={addValues} value={form.os_add} onChange={(e) => setForm({ ...form, os_add: parseFloat(e.target.value) })} sign />
                             </div>
                           </div>
                         </div>
@@ -309,6 +341,7 @@ const PrescriptionModal = ({ onComplete }) => {
                               value={form.pd}
                               onChange={(e) => setForm({ ...form, pd: parseInt(e.target.value, 10) })}
                             >
+                              <option value="">{'Select'}</option>
                               {pdValues.map((pd) => (
                                 <option key={pd} value={pd}>
                                   {pd}
@@ -331,6 +364,7 @@ const PrescriptionModal = ({ onComplete }) => {
                                   value={form.right_pd}
                                   onChange={(e) => setForm({ ...form, right_pd: parseFloat(e.target.value) })}
                                 >
+                                  <option value="">{'Select'}</option>
                                   {pdMonoValues.map((pd) => (
                                     <option key={`r-${pd}`} value={pd}>
                                       {pd.toFixed(1)}
@@ -345,6 +379,7 @@ const PrescriptionModal = ({ onComplete }) => {
                                   value={form.left_pd}
                                   onChange={(e) => setForm({ ...form, left_pd: parseFloat(e.target.value) })}
                                 >
+                                  <option value="">{'Select'}</option>
                                   {pdMonoValues.map((pd) => (
                                     <option key={`l-${pd}`} value={pd}>
                                       {pd.toFixed(1)}
@@ -366,119 +401,227 @@ const PrescriptionModal = ({ onComplete }) => {
                 </div>
                 {/* Mobile layout (stacked) */}
                 <div className="d-md-none">
-                {/* Header: RIGHT / LEFT */}
-                <div className="row g-3 align-items-center mb-2">
-                  <div className="col-12 col-md-2"></div>
-                  <div className="col-6 col-md-5 text-uppercase small fw-semibold text-muted">Right OD</div>
-                  <div className="col-6 col-md-5 text-uppercase small fw-semibold text-muted">Left OS</div>
-                </div>
-                {/* SPH */}
-                <div className="row g-2 align-items-center mb-2">
-                  <div className="col-12 col-md-2 text-muted">SPH</div>
-                  <div className="col-6 col-md-5">
-                    <Select values={sphValues} value={form.od_sph} onChange={(e) => setForm({ ...form, od_sph: parseFloat(e.target.value) })} sign />
+                  {/* Header: RIGHT / LEFT */}
+                  <div className="row g-3 align-items-center mb-2">
+                    <div className="col-12 col-md-2"></div>
+                    <div className="col-6 col-md-5 text-uppercase small fw-semibold text-muted">Right OD</div>
+                    <div className="col-6 col-md-5 text-uppercase small fw-semibold text-muted">Left OS</div>
                   </div>
-                  <div className="col-6 col-md-5">
-                    <Select values={sphValues} value={form.os_sph} onChange={(e) => setForm({ ...form, os_sph: parseFloat(e.target.value) })} sign />
-                  </div>
-                </div>
-                {/* CYL */}
-                <div className="row g-2 align-items-center mb-2">
-                  <div className="col-12 col-md-2 text-muted">CYL</div>
-                  <div className="col-6 col-md-5">
-                    <Select values={cylValues} value={form.od_cyl} onChange={(e) => setForm({ ...form, od_cyl: parseFloat(e.target.value) })} sign />
-                  </div>
-                  <div className="col-6 col-md-5">
-                    <Select values={cylValues} value={form.os_cyl} onChange={(e) => setForm({ ...form, os_cyl: parseFloat(e.target.value) })} sign />
-                  </div>
-                </div>
-                {/* AXIS */}
-                <div className="row g-2 align-items-center mb-2">
-                  <div className="col-12 col-md-2 text-muted">AXIS</div>
-                  <div className="col-6 col-md-5">
-                    <Select values={axisValues} value={form.od_axis} onChange={(e) => setForm({ ...form, od_axis: parseInt(e.target.value, 10) })} decimals={0} />
-                  </div>
-                  <div className="col-6 col-md-5">
-                    <Select values={axisValues} value={form.os_axis} onChange={(e) => setForm({ ...form, os_axis: parseInt(e.target.value, 10) })} decimals={0} />
-                  </div>
-                </div>
-                {/* ADD */}
-                <div className="row g-2 align-items-center mb-4">
-                  <div className="col-12 col-md-2 text-muted">ADD</div>
-                  <div className="col-6 col-md-5">
-                    <Select values={addValues} value={form.od_add} onChange={(e) => setForm({ ...form, od_add: parseFloat(e.target.value) })} sign />
-                  </div>
-                  <div className="col-6 col-md-5">
-                    <Select values={addValues} value={form.os_add} onChange={(e) => setForm({ ...form, os_add: parseFloat(e.target.value) })} sign />
-                  </div>
-                </div>
-                {/* PD */}
-                <div className="row g-2 align-items-center mb-3">
-                  <div className="col-12 col-md-2 text-muted">PD</div>
-                  {!hasTwoPD ? (
-                    <div className="col-12">
-                      <div className="d-flex align-items-center gap-2">
-                        <select
-                          className="form-select"
-                          value={form.pd}
-                          onChange={(e) => setForm({ ...form, pd: parseInt(e.target.value, 10) })}
-                        >
-                          {pdValues.map((pd) => (
-                            <option key={`m-${pd}`} value={pd}>
-                              {pd}
-                            </option>
-                          ))}
-                        </select>
-                        <button type="button" className="btn btn-link p-0" onClick={() => setHasTwoPD(true)}>
-                          I have 2 PD numbers
-                        </button>
-                      </div>
+                  {/* SPH */}
+                  <div className="row g-2 align-items-center mb-2">
+                    <div className="col-12 col-md-2 text-muted">SPH</div>
+                    <div className="col-6 col-md-5">
+                      <Select values={sphValues} value={form.od_sph} onChange={(e) => setForm({ ...form, od_sph: parseFloat(e.target.value) })} sign />
                     </div>
-                  ) : (
-                    <div className="col-12">
-                      <div className="row g-2">
-                        <div className="col-6">
-                          <div className="text-uppercase small text-muted mb-1 text-center">Right PD</div>
-                          <select
-                            className="form-select text-center"
-                            value={form.right_pd}
-                            onChange={(e) => setForm({ ...form, right_pd: parseFloat(e.target.value) })}
+                    <div className="col-6 col-md-5">
+                      <Select values={sphValues} value={form.os_sph} onChange={(e) => setForm({ ...form, os_sph: parseFloat(e.target.value) })} sign />
+                    </div>
+                  </div>
+                  {/* CYL */}
+                  <div className="row g-2 align-items-center mb-2">
+                    <div className="col-12 col-md-2 text-muted">CYL</div>
+                    <div className="col-6 col-md-5">
+                      <Select values={cylValues} value={form.od_cyl} onChange={(e) => setForm({ ...form, od_cyl: parseFloat(e.target.value) })} sign />
+                    </div>
+                    <div className="col-6 col-md-5">
+                      <Select values={cylValues} value={form.os_cyl} onChange={(e) => setForm({ ...form, os_cyl: parseFloat(e.target.value) })} sign />
+                    </div>
+                  </div>
+                  {/* AXIS */}
+                  <div className="row g-2 align-items-center mb-2">
+                    <div className="col-12 col-md-2 text-muted">AXIS</div>
+                    <div className="col-6 col-md-5">
+                      <Select className="py-2 px-2" values={axisValues} value={form.od_axis} onChange={(e) => setForm({ ...form, od_axis: parseInt(e.target.value, 10) })} decimals={0} />
+                    </div>
+                    <div className="col-6 col-md-5">
+                      <Select className="py-2 px-2" values={axisValues} value={form.os_axis} onChange={(e) => setForm({ ...form, os_axis: parseInt(e.target.value, 10) })} decimals={0} />
+                    </div>
+                  </div>
+                  {/* ADD */}
+                  <div className="row g-2 align-items-center mb-4">
+                    <div className="col-12 col-md-2 text-muted">ADD</div>
+                    <div className="col-6 col-md-5">
+                      <Select className="py-2 px-2" values={addValues} value={form.od_add} onChange={(e) => setForm({ ...form, od_add: parseFloat(e.target.value) })} sign />
+                    </div>
+                    <div className="col-6 col-md-5">
+                      <Select className="py-2 px-2" values={addValues} value={form.os_add} onChange={(e) => setForm({ ...form, os_add: parseFloat(e.target.value) })} sign />
+                    </div>
+                  </div>
+                  {/* PD */}
+                  <div className="row g-2 align-items-center mb-3">
+                    <div className="col-12 col-md-2 text-muted">PD</div>
+                    {!hasTwoPD ? (
+                      <div className="col-12">
+                        <div className="d-flex align-items-center gap-2">
+                        <select
+                            className="form-select"
+                            value={form.pd}
+                            onChange={(e) => setForm({ ...form, pd: parseInt(e.target.value, 10) })}
                           >
-                            {pdMonoValues.map((pd) => (
-                              <option key={`mr-${pd}`} value={pd}>
-                                {pd.toFixed(1)}
+                          <option value="">{'Select'}</option>
+                            {pdValues.map((pd) => (
+                              <option key={`m-${pd}`} value={pd}>
+                                {pd}
                               </option>
                             ))}
                           </select>
-                        </div>
-                        <div className="col-6">
-                          <div className="text-uppercase small text-muted mb-1 text-center">Left PD</div>
-                          <select
-                            className="form-select text-center"
-                            value={form.left_pd}
-                            onChange={(e) => setForm({ ...form, left_pd: parseFloat(e.target.value) })}
-                          >
-                            {pdMonoValues.map((pd) => (
-                              <option key={`ml-${pd}`} value={pd}>
-                                {pd.toFixed(1)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-12 text-center">
-                          <button type="button" className="btn btn-link p-0" onClick={() => setHasTwoPD(false)}>
-                            I have 1 PD number
+                          <button type="button" className="btn btn-link p-0" onClick={() => setHasTwoPD(true)}>
+                            I have 2 PD numbers
                           </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="col-12">
+                        <div className="row g-2">
+                          <div className="col-6">
+                            <div className="text-uppercase small text-muted mb-1 text-center">Right PD</div>
+                          <select
+                              className="form-select text-center"
+                              value={form.right_pd}
+                              onChange={(e) => setForm({ ...form, right_pd: parseFloat(e.target.value) })}
+                            >
+                            <option value="">{'Select'}</option>
+                              {pdMonoValues.map((pd) => (
+                                <option key={`mr-${pd}`} value={pd}>
+                                  {pd.toFixed(1)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-6">
+                            <div className="text-uppercase small text-muted mb-1 text-center">Left PD</div>
+                          <select
+                              className="form-select text-center"
+                              value={form.left_pd}
+                              onChange={(e) => setForm({ ...form, left_pd: parseFloat(e.target.value) })}
+                            >
+                            <option value="">{'Select'}</option>
+                              {pdMonoValues.map((pd) => (
+                                <option key={`ml-${pd}`} value={pd}>
+                                  {pd.toFixed(1)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-12 text-center">
+                            <button type="button" className="btn btn-link p-0" onClick={() => setHasTwoPD(false)}>
+                              I have 1 PD number
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Prism (responsive, below PD) */}
+                <div className="mt-3">
+                  <div className="form-check mb-2">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="usePrism"
+                      checked={form.prismEnabled}
+                      onChange={(e) => setForm({ ...form, prismEnabled: e.target.checked })}
+                    />
+                    <label className="form-check-label fw-semibold ms-2" htmlFor="usePrism">PRISM</label>
+                  </div>
+
+                  {form.prismEnabled && (
+                    <div className="border rounded-2 p-3">
+                      <div className="row g-2 small fw-semibold text-muted mb-2">
+                        <div className="col-3 col-md-2">TYPE</div>
+                        <div className="col-4 col-md-3">Prism</div>
+                        <div className="col-5 col-md-3">Base Direction</div>
+                      </div>
+
+                      {/* RIGHT OD */}
+                      <div className="row g-2 align-items-center mb-2">
+                        <div className="col-3 col-md-2 text-muted">RIGHT OD</div>
+                        <div className="col-4 col-md-3">
+                          <select
+                            className="form-select"
+                            value={form.od_prism_ver}
+                            onChange={(e) => setForm({ ...form, od_prism_ver: e.target.value })}
+                          >
+                            <option value="">{'Select'}</option>
+                            {prismValues.map(v => (<option key={`odpv-${v}`} value={v}>{v}</option>))}
+                          </select>
+                        </div>
+                        <div className="col-5 col-md-3">
+                          <select
+                            className="form-select"
+                            value={form.od_prism_ver_dir}
+                            onChange={(e) => setForm({ ...form, od_prism_ver_dir: e.target.value })}
+                          >
+                            <option value="">{'Select'}</option>
+                            <option value="IN">IN</option>
+                            <option value="OUT">OUT</option>
+                            <option value="UP">UP</option>
+                            <option value="DOWN">DOWN</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* LEFT OS */}
+                      <div className="row g-2 align-items-center">
+                        <div className="col-3 col-md-2 text-muted">LEFT-OS</div>
+                        <div className="col-4 col-md-3">
+                          <select
+                            className="form-select"
+                            value={form.os_prism_ver}
+                            onChange={(e) => setForm({ ...form, os_prism_ver: e.target.value })}
+                          >
+                            <option value="">{'Select'}</option>
+                            {prismValues.map(v => (<option key={`ospv-${v}`} value={v}>{v}</option>))}
+                          </select>
+                        </div>
+                        <div className="col-5 col-md-3">
+                          <select
+                            className="form-select"
+                            value={form.os_prism_ver_dir}
+                            onChange={(e) => setForm({ ...form, os_prism_ver_dir: e.target.value })}
+                          >
+                            <option value="">{'Select'}</option>
+                            <option value="IN">IN</option>
+                            <option value="OUT">OUT</option>
+                            <option value="UP">UP</option>
+                            <option value="DOWN">DOWN</option>
+                          </select>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
-                </div>
 
                 <div className="mt-4">
                   <div className="d-flex gap-2 mt-3 justify-content-end">
-                    <button type="button" className="btn btn-warning text-white" onClick={() => setStep(2)}>Next</button>
+                    <button
+                      type="button"
+                      className="btn btn-warning text-white"
+                      onClick={() => {
+                        const isBlank = (v) => v === '' || v === null || v === undefined || (typeof v === 'number' && Number.isNaN(v))
+                        const req = [
+                          form.od_sph, form.od_cyl, form.od_axis, form.od_add,
+                          form.os_sph, form.os_cyl, form.os_axis, form.os_add,
+                        ]
+                        const pdOk = hasTwoPD ? (!isBlank(form.right_pd) && !isBlank(form.left_pd)) : (!isBlank(form.pd))
+                        const baseOk = req.every((v) => !isBlank(v))
+                        const prismOk = !form.prismEnabled || (
+                          !isBlank(form.od_prism_ver) &&
+                          !isBlank(form.od_prism_ver_dir) &&
+                          !isBlank(form.os_prism_ver) &&
+                          !isBlank(form.os_prism_ver_dir)
+                        )
+                        if (!baseOk || !pdOk || !prismOk) {
+                          toast.error('Please fill all the required prescription table values')
+                          return
+                        }
+                        setStep(2)
+                      }}
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
               </>
@@ -489,10 +632,10 @@ const PrescriptionModal = ({ onComplete }) => {
                 <h3 className="mb-1">Step 2 - Rx Type</h3>
                 <div className="row g-3 mt-2">
                   {[
-                    { key: 'distance', title: 'DISTANCE', desc: 'Corrects vision of distant objects. All time wear.', img:Img1 },
-                    { key: 'reading', title: 'READING', desc: 'Corrects vision of near objects.', img:Img2 },
-                    { key: 'bifocal', title: 'BIFOCAL WITH LINE', desc: 'Correct near & distance vision and has a visible line in the lens.' , img:Img3},
-                    { key: 'progressive', title: 'PROGRESSIVE (NO LINE)', desc: 'Corrects near & distance vision and does not have any visible line.',img:Img4 },
+                    { key: 'distance', title: 'DISTANCE', desc: 'Corrects vision of distant objects. All time wear.', img: Img1 },
+                    { key: 'reading', title: 'READING', desc: 'Corrects vision of near objects.', img: Img2 },
+                    { key: 'bifocal', title: 'BIFOCAL WITH LINE', desc: 'Correct near & distance vision and has a visible line in the lens.', img: Img3 },
+                    { key: 'progressive', title: 'PROGRESSIVE (NO LINE)', desc: 'Corrects near & distance vision and does not have any visible line.', img: Img4 },
                   ].map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
@@ -505,22 +648,22 @@ const PrescriptionModal = ({ onComplete }) => {
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
                           <div
-  className="rounded-circle bg-light border d-flex align-items-center justify-content-center px-5"
-  style={{
-    width: "96px",
-    height: "96px",
-    overflow: "hidden"   // 🔥 This is the key
-  }}
->
-  <img
-    src={item.img}
-    alt=""
-    style={{
-      maxWidth: "86px",
-      maxHeight: "85px",
-    }}
-  />
-</div> 
+                            className="rounded-circle bg-light border d-flex align-items-center justify-content-center px-5"
+                            style={{
+                              width: "96px",
+                              height: "96px",
+                              overflow: "hidden"   // 🔥 This is the key
+                            }}
+                          >
+                            <img
+                              src={item.img}
+                              alt=""
+                              style={{
+                                maxWidth: "86px",
+                                maxHeight: "85px",
+                              }}
+                            />
+                          </div>
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
                       </button>
@@ -640,24 +783,25 @@ const PrescriptionModal = ({ onComplete }) => {
                     const titleUpper = String(item.title || '').toUpperCase()
                     const priceLabel = `$${Number(item.price || 0).toFixed(2)}`
                     const heading = `${[thicknessLabel, titleUpper].filter(Boolean).join(' ')}+ ${priceLabel}`
-    return (
-                    <div key={item._id} className="col-12 col-md-6">
-                      <button
-                        type="button"
-                        onClick={() => { setLensOption(item._id); setStep(5) }}
-                        className={`w-100 text-start bg-white border rounded-3 p-4 h-100 ${lensOption === item._id ? 'border-primary shadow' : ''}`}
-                      >
-                        <div className="fw-bold mb-2 text-center">{heading}</div>
-                        <hr className="my-3" />
-                        <div className="d-flex align-items-center gap-3">
-                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 80, height: 80 }}>
-                            <span className="fs-3">🥽</span>
+                    return (
+                      <div key={item._id} className="col-12 col-md-6">
+                        <button
+                          type="button"
+                          onClick={() => { setLensOption(item._id); setStep(5) }}
+                          className={`w-100 text-start bg-white border rounded-3 p-4 h-100 ${lensOption === item._id ? 'border-primary shadow' : ''}`}
+                        >
+                          <div className="fw-bold mb-2 text-center">{heading}</div>
+                          <hr className="my-3" />
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 80, height: 80 }}>
+                              <span className="fs-3">🥽</span>
+                            </div>
+                            <p className="mb-0 text-muted">{item.description}</p>
                           </div>
-                          <p className="mb-0 text-muted">{item.description}</p>
-                        </div>
-                      </button>
-                    </div>
-                  )})}
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
                 <div className="d-flex justify-content-start mt-4">
                   <button type="button" className="btn btn-outline-secondary" onClick={() => setStep(3)}>Previous</button>
@@ -697,7 +841,7 @@ const PrescriptionModal = ({ onComplete }) => {
                       </button>
                     </div>
                   ))}
-                    </div>
+                </div>
                 <div className="d-flex justify-content-between mt-4">
                   <button type="button" className="btn btn-outline-secondary" onClick={() => setStep(4)}>Previous</button>
                   <button
@@ -734,9 +878,15 @@ const PrescriptionModal = ({ onComplete }) => {
                           os: { sph: form.os_sph, cyl: form.os_cyl, axis: form.os_axis, add: form.os_add },
                           pd: hasTwoPD ? { right: form.right_pd, left: form.left_pd } : form.pd,
                           name: form.name,
+                          ...(form.prismEnabled ? {
+                            prism: {
+                              od: { value: form.od_prism_ver || '', dir: form.od_prism_ver_dir || '' },
+                              os: { value: form.os_prism_ver || '', dir: form.os_prism_ver_dir || '' },
+                            }
+                          } : {}),
                         },
                       }
-                      try { onComplete && onComplete(payload) } catch {}
+                      try { onComplete && onComplete(payload) } catch { }
                       const el = document.getElementById('exampleModal')
                       const bs = window?.bootstrap
                       if (el && bs?.Modal) bs.Modal.getOrCreateInstance(el).hide()
@@ -746,14 +896,14 @@ const PrescriptionModal = ({ onComplete }) => {
                   >
                     Add To Cart
                   </button>
-                    </div>
+                </div>
               </>
             )}
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
 export default PrescriptionModal

@@ -4,8 +4,8 @@ import { useState } from 'react'
 import useLocalStorage from '../useLocalStorage'
 import { toast } from 'react-toastify'
 
-// const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:8000'
+// const API_BASE = process.env.REACT_APP_API_BASE || 'https://glassesex-dot-arched-gear-433017-u9.de.r.appspot.com'
 const priceConverter = (amount) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
 
 const LOREM = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, debitis. Reprehenderit, illum. Vitae, minus. Nulla laboriosam, dolorum possimus, reiciendis dignissimos aut eaque nihil, consequuntur fuga laudantium repellendus. Aliquid, laborum facilis.</p>'
@@ -106,6 +106,7 @@ const AppState = (props) => {
   const [lenses, setLenses] = useState([])
   const [globalLoader, setGlobalLoader] = useState(false)
   const [posts, setPosts] = useState([])
+  const [discountCodes, setDiscountCodes] = useState([])
 
   // helper to extract validator / server errors nicely
   const extractError = async (res, fallback = 'Request failed') => {
@@ -160,12 +161,14 @@ const AppState = (props) => {
     const sizeKey = selectedSize ? selectedSize._id : 'base'
     // Build a stable key from prescription values so any change makes a unique cart line
     const rx = prescription?.prescription || {}
+    const prism = rx?.prism || {}
     const rxKey = [
       `rx:${prescription?.rxType || ''}`,
       `lt:${prescription?.lensType || ''}`,
       `od:${[rx?.od?.sph, rx?.od?.cyl, rx?.od?.axis, rx?.od?.add].map((v) => v ?? '').join(',')}`,
       `os:${[rx?.os?.sph, rx?.os?.cyl, rx?.os?.axis, rx?.os?.add].map((v) => v ?? '').join(',')}`,
       `pd:${rx?.hasTwoPD ? [rx?.pd?.right ?? '', rx?.pd?.left ?? ''].join(',') : (rx?.pd ?? '')}`,
+      `pr:${[prism?.od?.value ?? '', prism?.od?.dir ?? '', prism?.os?.value ?? '', prism?.os?.dir ?? ''].join(',')}`,
     ].join('|')
     const itemId = `${product._id}|${sizeKey}|${lensId}|${coatingKey}|${rxKey}`
     const basePrice = selectedSize
@@ -524,6 +527,55 @@ const AppState = (props) => {
     setLenses(Array.isArray(data) ? data : [])
     return data
   }
+
+  // Discount Codes
+  const fetchDiscountCodes = async () => {
+    const res = await fetch(`${API_BASE}/api/discount-codes`)
+    const data = await res.json()
+    setDiscountCodes(Array.isArray(data) ? data : [])
+    return data
+  }
+  const fetchDiscountCodeById = async (id) => {
+    const res = await fetch(`${API_BASE}/api/discount-codes/${id}`)
+    if (!res.ok) return null
+    return await res.json()
+  }
+  const lookupDiscountCode = async (code) => {
+    const res = await fetch(`${API_BASE}/api/discount-codes/code/${encodeURIComponent(code || '')}`)
+    if (!res.ok) return null
+    return await res.json()
+  }
+  const createDiscountCode = async (payload) => {
+    const res = await fetch(`${API_BASE}/api/discount-codes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error('Create discount code failed')
+    const data = await res.json()
+    toast.success('Discount code created')
+    return data
+  }
+  const editDiscountCode = async (id, payload) => {
+    const res = await fetch(`${API_BASE}/api/discount-codes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error('Update discount code failed')
+    const data = await res.json()
+    toast.success('Discount code updated')
+    return data
+  }
+  const deleteDiscountCode = async (id) => {
+    const res = await fetch(`${API_BASE}/api/discount-codes/${id}`, {
+      method: 'DELETE',
+      headers: { 'auth-token': adminToken },
+    })
+    if (!res.ok) throw new Error('Delete discount code failed')
+    toast.info('Discount code deleted')
+    return true
+  }
   const fetchLensById = async (id) => {
     const res = await fetch(`${API_BASE}/api/lenses/${id}`)
     return await res.json()
@@ -665,7 +717,7 @@ const AppState = (props) => {
   }
 
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, globalLoader, setGlobalLoader }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, discountCodes, fetchDiscountCodes, fetchDiscountCodeById, lookupDiscountCode, createDiscountCode, editDiscountCode, deleteDiscountCode, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )

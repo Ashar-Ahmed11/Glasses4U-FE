@@ -33,7 +33,7 @@ export default function Checkout() {
 
 
     const history = useHistory()
-    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken, sendOrderEmail } = useContext(AppContext)
+    const { basicInfo, cart, createStripeSession, getBasicInfo, createOrder, clearCart, getUser, userToken, sendOrderEmail, lookupDiscountCode } = useContext(AppContext)
     const [checkoutLoader, setCheckoutLoader] = useState(false)
     const [rxItem, setRxItem] = useState(null)
     const RX_LABEL = { distance: 'Distance', reading: 'Reading', bifocal: 'Bifocal with line', progressive: 'Progressive (no line)' }
@@ -79,9 +79,13 @@ export default function Checkout() {
 
 
     const totalCal = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+    const [discountCode, setDiscountCode] = useState('')
+    const [appliedDiscount, setAppliedDiscount] = useState({ code: '', pct: 0 })
+    const [applying, setApplying] = useState(false)
 
     const delivery = Number(basicInfo?.deliveryCharges || 0)
-    const total = totalCal + delivery
+    const subtotal = Math.max(0, totalCal * (1 - (Number(appliedDiscount.pct || 0) / 100)))
+    const total = subtotal + delivery
 
     const theSubtotal = total.toLocaleString('en-US', {
         style: 'currency',
@@ -133,7 +137,7 @@ export default function Checkout() {
                         <div className='mt-4' style={{ color: color }}>
                             <div className="d-flex justify-content-between">
                                 <p>Subtotal</p>
-                                <p>{totalCal.toLocaleString('en-US', {
+                                <p>{subtotal.toLocaleString('en-US', {
                                     style: 'currency',
                                     currency: 'USD',
                                 })}</p>
@@ -153,6 +157,46 @@ export default function Checkout() {
 
                         </div>
                     </div>
+                </div>
+                {/* Discount code apply (outside collapse) */}
+                <div className="px-4 mt-3" style={{ color }}>
+                    <div className="d-flex gap-2">
+                        <input
+                          value={discountCode}
+                          onChange={(e)=>setDiscountCode(e.target.value)}
+                          placeholder="Discount code"
+                          className="form-control"
+                          style={{ backgroundColor: '#ffffff', borderColor: "#dedede", color: 'black' }}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-dark d-inline-flex align-items-center gap-2"
+                          disabled={applying}
+                          onClick={async () => {
+                            const code = String(discountCode || '').trim()
+                            if (!code) { setAppliedDiscount({ code:'', pct:0 }); return }
+                            setApplying(true)
+                            try {
+                              const found = await lookupDiscountCode(code)
+                              if (found && typeof found.discountPercentage === 'number') {
+                                setAppliedDiscount({ code: found.discountCodeName, pct: Number(found.discountPercentage) })
+                                toast.success('Discount code applied')
+                              } else {
+                                setAppliedDiscount({ code:'', pct:0 })
+                                toast.error('Invalid discount code')
+                              }
+                            } finally {
+                              setApplying(false)
+                            }
+                          }}
+                        >
+                          {applying && (<span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>)}
+                          {applying ? 'Applying...' : 'Apply'}
+                        </button>
+                    </div>
+                    {appliedDiscount.code && (
+                      <div className="small text-success mt-1">Applied {appliedDiscount.code} (-{Number(appliedDiscount.pct).toFixed(0)}%)</div>
+                    )}
                 </div>
                 <div className='container-fluid my-3'>
                     <form onSubmit={(e) => e.preventDefault()}>
@@ -254,9 +298,9 @@ export default function Checkout() {
                                                             name: `${form.firstname} ${form.lastname}`.trim(),
                                                             email: form.email,
                                                             products: productsPayload,
-                                                            subtotal: Number(totalCal.toFixed(2)),
+                                                            subtotal: Number(subtotal.toFixed(2)),
                                                             deliveryCharges: Number(delivery),
-                                                            total: Number((totalCal + delivery).toFixed(2)),
+                                                            total: Number((subtotal + delivery).toFixed(2)),
                                                             country: form.country || '',
                                                             city: form.city,
                                                             phone: form.phone,
@@ -279,9 +323,9 @@ export default function Checkout() {
                                                                 postalCode: form.postalCode || '',
                                                                 trackingId: saved?.trackingId || '',
                                                                 status: 'Pending Approval',
-                                                                subtotal: Number(totalCal.toFixed(2)),
+                                                                subtotal: Number(subtotal.toFixed(2)),
                                                                 deliveryCharges: Number(delivery),
-                                                                total: Number((totalCal + delivery).toFixed(2)),
+                                                                total: Number((subtotal + delivery).toFixed(2)),
                                                                 items: cart.map((it) => ({
                                                                     name: it.name,
                                                                     image: it.image,
@@ -302,9 +346,9 @@ export default function Checkout() {
                                                                 postalCode: form.postalCode || '',
                                                                 trackingId: saved?.trackingId || '',
                                                                 status: 'Pending Approval',
-                                                                subtotal: Number(totalCal.toFixed(2)),
+                                                                subtotal: Number(subtotal.toFixed(2)),
                                                                 deliveryCharges: Number(delivery),
-                                                                total: Number((totalCal + delivery).toFixed(2)),
+                                                                total: Number((subtotal + delivery).toFixed(2)),
                                                                 items: cart.map((it) => ({
                                                                     name: it.name,
                                                                     image: it.image,
@@ -453,6 +497,25 @@ export default function Checkout() {
                                                 </div>
                                             </>
                                         )}
+                                        {(() => {
+                                            const prism = rxItem?.prescription?.prescription?.prism || rxItem?.prescription?.prism
+                                            if (!prism) return null
+                                            const od = prism.od || {}
+                                            const os = prism.os || {}
+                                            const fmt = (v, d) => [v || 'None', d || ''].filter(Boolean).join(' ')
+                                            return (
+                                                <>
+                                                    <div className="list-group-item d-flex justify-content-between">
+                                                        <span className="text-muted">Prism (Right OD)</span>
+                                                        <span>{fmt(od.value, od.dir)}</span>
+                                                    </div>
+                                                    <div className="list-group-item d-flex justify-content-between">
+                                                        <span className="text-muted">Prism (Left OS)</span>
+                                                        <span>{fmt(os.value, os.dir)}</span>
+                                                    </div>
+                                                </>
+                                            )
+                                        })()}
                                     </div>
                                 </>
                             )}

@@ -31,6 +31,11 @@ const AdminLinks = ({ mobile }) => {
         </Link>
       </li>
       <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
+        <Link to="/dashboard/discount-codes" className={`py-2 customlinks nav-link ${isActive("/dashboard/discount-codes") ? "active" : ""}`}>
+          <i className="fa fa-ticket me-2"></i> <span className="ms-1 text-light small">Discount Codes</span>
+        </Link>
+      </li>
+      <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
         <Link to="/dashboard/create-product" className={`py-2 customlinks nav-link ${isActive("/dashboard/create-product") ? "active" : ""}`}>
           <i className="fa fa-plus-circle me-2"></i> <span className="ms-1 text-light small">Create Product</span>
         </Link>

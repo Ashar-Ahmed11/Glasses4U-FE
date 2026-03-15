@@ -308,6 +308,25 @@ export default function Orders() {
                         </div>
                       </>
                     )}
+                    {(() => {
+                      const prism = rxItem?.prescription?.prescription?.prism || rxItem?.prescription?.prism
+                      if (!prism) return null
+                      const od = prism.od || {}
+                      const os = prism.os || {}
+                      const fmt = (v, d) => [v || 'None', d || ''].filter(Boolean).join(' ')
+                      return (
+                        <>
+                          <div className="list-group-item d-flex justify-content-between">
+                            <span className="text-muted">Prism (Right OD)</span>
+                            <span>{fmt(od.value, od.dir)}</span>
+                          </div>
+                          <div className="list-group-item d-flex justify-content-between">
+                            <span className="text-muted">Prism (Left OS)</span>
+                            <span>{fmt(os.value, os.dir)}</span>
+                          </div>
+                        </>
+                      )
+                    })()}
                   </div>
                 </>
               )}
