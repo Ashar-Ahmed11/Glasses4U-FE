@@ -219,6 +219,7 @@ const PrescriptionModal = ({ onComplete }) => {
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
+      style={{ zIndex: 99999999999}}
     >
       <div className="modal-dialog modal-dialog-centered modal-lg">
         <div className="modal-content">
