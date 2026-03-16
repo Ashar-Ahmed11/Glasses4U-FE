@@ -70,7 +70,7 @@ const ShippingPolicy = () => {
               <p className="mb-1">Standard Shipping to the US, UK, Canada and Ireland is 14–21 Working Days and for other countries, it is 3–4 Weeks.</p>
               <p className="mb-1">$5.95 per single pair. If you order two or more pairs, the shipping cost for the current order is removed.</p>
               <p className="mb-1">Orders above $80 qualify for a promotional offer (same frame in two quantities).</p>
-              <p className="mb-3">We also offer <strong>USPS Priority Shipping</strong> within the United States with a turnaround time of 10–12 business days.</p>
+              {/* <p className="mb-3">We also offer <strong>USPS Priority Shipping</strong> within the United States with a turnaround time of 10–12 business days.</p> */}
             </div>
 
             <p className="mb-4">

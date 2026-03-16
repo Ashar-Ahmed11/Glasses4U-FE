@@ -42,7 +42,7 @@ const OrderingGuide = () => {
     <div className="col-12 col-lg-8 col-md-10">
 
       <h2 className="fw-bold mb-2 text-center text-md-start">
-        How to Order Your Eye Glasses from Glasses For You
+        How to Order Your Eye Glasses from Glasses 4U
       </h2>
 
       <p className="text-muted mb-2" style={{ lineHeight: '1.8' }}>

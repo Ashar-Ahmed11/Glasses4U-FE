@@ -601,23 +601,6 @@ const PrescriptionModal = ({ onComplete }) => {
                       type="button"
                       className="btn btn-warning text-white"
                       onClick={() => {
-                        const isBlank = (v) => v === '' || v === null || v === undefined || (typeof v === 'number' && Number.isNaN(v))
-                        const req = [
-                          form.od_sph, form.od_cyl, form.od_axis, form.od_add,
-                          form.os_sph, form.os_cyl, form.os_axis, form.os_add,
-                        ]
-                        const pdOk = hasTwoPD ? (!isBlank(form.right_pd) && !isBlank(form.left_pd)) : (!isBlank(form.pd))
-                        const baseOk = req.every((v) => !isBlank(v))
-                        const prismOk = !form.prismEnabled || (
-                          !isBlank(form.od_prism_ver) &&
-                          !isBlank(form.od_prism_ver_dir) &&
-                          !isBlank(form.os_prism_ver) &&
-                          !isBlank(form.os_prism_ver_dir)
-                        )
-                        if (!baseOk || !pdOk || !prismOk) {
-                          toast.error('Please fill all the required prescription table values')
-                          return
-                        }
                         setStep(2)
                       }}
                     >
