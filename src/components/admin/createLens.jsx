@@ -9,20 +9,20 @@ export default function CreateLens() {
   const { lensid } = useParams()
   const history = useHistory()
   const { createLens, editLens, fetchLensById, deleteLens, uploadImage } = useContext(AppContext)
-  const [form, setForm] = useState({ title: '', description: '', price: '', thickness: '', rxType: RX_TYPES[0], lensType: LENS_TYPES[0], image: '' })
+  const [form, setForm] = useState({ title: '', description: '', price: '', salePrice: '', thickness: '', rxType: RX_TYPES[0], lensType: LENS_TYPES[0], image: '' })
   useEffect(() => {
     const token = localStorage.getItem('auth-token')
     if (!token) return history.push('/admin')
     ;(async () => {
       if (lensid) {
         const d = await fetchLensById(lensid)
-        if (d) setForm({ title: d.title||'', description: d.description||'', price: d.price||'', thickness: d.thickness||'', rxType: d.rxType||RX_TYPES[0], lensType: d.lensType||LENS_TYPES[0], image: d.image || '' })
+        if (d) setForm({ title: d.title||'', description: d.description||'', price: d.price||'', salePrice: d.salePrice||'', thickness: d.thickness||'', rxType: d.rxType||RX_TYPES[0], lensType: d.lensType||LENS_TYPES[0], image: d.image || '' })
       }
     })()
   }, [lensid])
   const onSubmit = async (e) => {
     e.preventDefault()
-    const payload = { ...form, price: Number(form.price||0), thickness: Number(form.thickness||0) }
+    const payload = { ...form, price: Number(form.price||0), salePrice: Number(form.salePrice||0), thickness: Number(form.thickness||0) }
     if (lensid) await editLens(lensid, payload)
     else await createLens(payload)
     history.push('/dashboard/eyewear')
@@ -43,8 +43,9 @@ export default function CreateLens() {
           {form.image && <img src={form.image} alt="lens" className="img-fluid mt-2 rounded" style={{ maxHeight: 140, objectFit: 'cover' }} />}
         </div>
         <div className="row g-2">
-          <div className="col-md-6"><input type="number" className="form-control mb-2" placeholder="Price" value={form.price} onChange={(e)=>setForm({ ...form, price: e.target.value })} /></div>
-          <div className="col-md-6"><input type="number" className="form-control mb-2" placeholder="Thickness" value={form.thickness} onChange={(e)=>setForm({ ...form, thickness: e.target.value })} /></div>
+          <div className="col-md-4"><input type="number" className="form-control mb-2" placeholder="Price" value={form.price} onChange={(e)=>setForm({ ...form, price: e.target.value })} /></div>
+          <div className="col-md-4"><input type="number" className="form-control mb-2" placeholder="Sale Price (optional)" value={form.salePrice} onChange={(e)=>setForm({ ...form, salePrice: e.target.value })} /></div>
+          <div className="col-md-4"><input type="number" className="form-control mb-2" placeholder="Thickness" value={form.thickness} onChange={(e)=>setForm({ ...form, thickness: e.target.value })} /></div>
         </div>
         <div className="row g-2">
           <div className="col-md-6">

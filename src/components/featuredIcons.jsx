@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Fashion from '../images/Fashion 2.png'
 
 const features = [
-  { img: Fashion, label: "Fashion", link:'/category/eye-glasses'},
+  // { img: Fashion, label: "Fashion", link:'/category/eye-glasses'},
   // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-rush-delivery.svg", label: "Fashion", link:'/category/eye-glasses'},
   // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-kids.svg", label: "Kids" },
   { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-progressive.svg", label: "Progressives" , link:'/category/eye-glasses'},
@@ -12,7 +12,7 @@ const features = [
   { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-night-driving.svg", label: "Night Driving" , link:'/category/eye-glasses'},
   // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-bloomz.svg", label: "EcoBloomz™" },
   // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-safety.svg", label: "Safety" },
-  { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-zunnies.svg", label: "Sports" , link:'/category/eye-glasses'},
+  // { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-zunnies.svg", label: "Sports" , link:'/category/eye-glasses'},
   { img: "https://static.zennioptical.com/marketing/homepage/shopbycategory/chip/HP-chips-sunglasses.svg", label: "Sunglasses" , link:'/category/eye-glasses'},
 ];
 

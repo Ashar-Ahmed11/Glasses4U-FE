@@ -762,10 +762,24 @@ const PrescriptionModal = ({ onComplete }) => {
               <>
                 <h3 className="mb-1">Step 4 - Lens Options</h3>
                 <div className="row g-3 mt-2">
-                  {(lenses || []).map((item) => {
+                  {(() => {
+                    const groupA = ['solid', 'gradient', 'mirror', 'dual'] // thickness > 0
+                    const groupB = ['polarized_mirror', 'polarized'] // thickness == 0
+                    const list = (() => {
+                      if (lensType === 'sunglasses' && tintType) {
+                        if (groupA.includes(tintType)) return (lenses || []).filter((l) => Number(l?.thickness || 0) > 0)
+                        if (groupB.includes(tintType)) return (lenses || []).filter((l) => Number(l?.thickness || 0) === 0)
+                      }
+                      return lenses || []
+                    })()
+                    return list
+                  })().map((item) => {
                     const thicknessLabel = item?.thickness !== undefined && item?.thickness !== '' ? Number(item.thickness).toFixed(2) : null
                     const titleUpper = String(item.title || '').toUpperCase()
-                    const priceLabel = `$${Number(item.price || 0).toFixed(2)}`
+                    const basePrice = Number(item.price || 0)
+                    const sale = Number(item.salePrice || 0)
+                    const displayPrice = sale > 0 ? sale : basePrice
+                    const priceLabel = `$${Number(displayPrice).toFixed(2)}`
                     const heading = `${[thicknessLabel, titleUpper].filter(Boolean).join(' ')}+ ${priceLabel}`
                     return (
                       <div key={item._id} className="col-12 col-md-6">
@@ -775,6 +789,12 @@ const PrescriptionModal = ({ onComplete }) => {
                           className={`w-100 text-start bg-white border rounded-3 p-4 h-100 ${lensOption === item._id ? 'border-primary shadow' : ''}`}
                         >
                           <div className="fw-bold mb-2 text-center">{heading}</div>
+                          {sale > 0 && (
+                            <div className="text-center mb-1">
+                              <span className="text-muted text-decoration-line-through me-2">${basePrice.toFixed(2)}</span>
+                              <span className="text-danger fw-semibold">${sale.toFixed(2)}</span>
+                            </div>
+                          )}
                           <hr className="my-3" />
                           <div className="d-flex align-items-center gap-3">
                             <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center overflow-hidden" style={item?.image ? {} : { width: 80, height: 80 }}>
@@ -837,6 +857,9 @@ const PrescriptionModal = ({ onComplete }) => {
                     className="btn btn-outline-secondary"
                     onClick={() => {
                       const lens = (lenses || []).find((l) => String(l._id) === String(lensOption)) || null
+                      const base = Number(lens?.price || 0)
+                      const sale = Number(lens?.salePrice || 0)
+                      const lensUnitPrice = sale > 0 ? sale : base
                       const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
                       const premiumPrice = Number(basicInfo?.premiumCoatingPrice || 0)
                       const bluecutPrice = Number(basicInfo?.bluecutCoatingPrice || 0)
@@ -849,7 +872,7 @@ const PrescriptionModal = ({ onComplete }) => {
                       const payload = {
                         rxType,
                         lensType,
-                        lens: lens ? { id: lens._id, title: lens.title, price: Number(lens.price || 0), thickness: lens.thickness } : null,
+                            lens: lens ? { id: lens._id, title: lens.title, price: Number(lensUnitPrice || 0), thickness: lens.thickness } : null,
                         coating: coatingMap[coating] || { key: 'none', title: 'No Coatings', price: 0 },
                         ...(lensType === 'sunglasses' && selectedTint && tintColor ? {
                           tint: {

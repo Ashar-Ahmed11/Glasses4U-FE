@@ -1,10 +1,19 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 import MetaDecorator from '../components/metaDecorator'
 import Coverimg from '../images/shipping policy.png'
+import AppContext from '../components/context/appContext'
 
 const ShippingPolicy = () => {
+  const { basicInfo, getBasicInfo } = useContext(AppContext)
+  useEffect(() => {
+    ;(async () => {
+      if (!basicInfo) await getBasicInfo()
+    })()
+  }, [basicInfo, getBasicInfo])
+  const email = basicInfo?.supportEmail || basicInfo?.contactEmail || basicInfo?.email || 'contact@glasses4u.com'
+  const phone = basicInfo?.supportPhone || basicInfo?.phone || basicInfo?.phoneNumber || '021-2038291'
   return (
     <>
       <Header />
@@ -142,7 +151,7 @@ const ShippingPolicy = () => {
 
             {/* Refund */}
             <p className="fw-semibold mb-1">Refund Policy</p>
-            <p className="mb-2">We offer a 100% satisfaction guarantee. You may request assistance within 50 days of receiving your order if you experience:</p>
+            <p className="mb-2">We offer a 100% satisfaction guarantee. You may request assistance within 150 days of receiving your order if you experience:</p>
             <p className="mb-1 ps-3">- Vision issues</p>
             <p className="mb-1 ps-3">- Frame size problems</p>
             <p className="mb-3 ps-3">- Dissatisfaction with the frame</p>
@@ -156,10 +165,10 @@ const ShippingPolicy = () => {
             </p>
 
             <p className="text-center mb-1">
-              <strong>Write to us:</strong> team@glasses-4u.com
+              <strong>Write to us:</strong> {email}
             </p>
             <p className="text-center mb-5">
-              <strong>Call Us:</strong> +1-888-972-9060.
+              <strong>Call Us:</strong> {phone}
             </p>
 
             {/* Footer CTA */}
