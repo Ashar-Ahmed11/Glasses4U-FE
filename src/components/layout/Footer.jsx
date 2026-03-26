@@ -105,11 +105,12 @@ const Footer = () => {
                     </svg>
                   </Logo>
                 </>
-              )
+              )         
             })()}
           </div>
         </div>
-        <div className="small text-muted mt-3 px-4">© 2025 Glasses 4U</div>
+        <div className="small text-muted mt-3 px-4">© 2026 Glasses 4U</div>
+        <div className="small text-muted mt-3 px-4">Website Developed by <a target='_blank' href="https://metatech-official.com">Website Development Company</a></div>
       </div>
     </footer>
   )
