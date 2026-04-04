@@ -51,10 +51,20 @@ const AdminLinks = ({ mobile }) => {
                 </Link>
             </li>
       <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
+        <Link to="/dashboard/create-subcategory" className={`py-2 customlinks nav-link ${isActive("/dashboard/create-subcategory") ? "active" : ""}`}>
+          <i className="fa fa-folder-open me-2"></i> <span className="ms-1 text-light small">Create Subcategory</span>
+        </Link>
+      </li>
+      <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
         <Link to="/dashboard/categories" className={`py-2 customlinks nav-link ${isActive("/dashboard/categories") ? "active" : ""}`}>
           <i className="fa fa-clone me-2"></i> <span className="ms-1 text-light small">View Categories</span>
                 </Link>
             </li>
+      <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
+        <Link to="/dashboard/subcategories" className={`py-2 customlinks nav-link ${isActive("/dashboard/subcategories") ? "active" : ""}`}>
+          <i className="fa fa-clone me-2"></i> <span className="ms-1 text-light small">View Subcategories</span>
+        </Link>
+      </li>
       <li data-bs-dismiss={mobile && "offcanvas"} className="nav-item w-100 py-1">
         <Link to="/dashboard/basic-info" className={`py-2 customlinks nav-link ${isActive("/dashboard/basic-info") ? "active" : ""}`}>
           <i className="fa fa-gear me-2"></i> <span className="ms-1 text-light small">Basic Info</span>

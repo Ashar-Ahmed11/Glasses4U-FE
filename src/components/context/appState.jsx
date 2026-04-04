@@ -108,6 +108,7 @@ const AppState = (props) => {
   const [posts, setPosts] = useState([])
   const [appliedDiscount, setAppliedDiscount] = useLocalStorage('appliedDiscount', { code: '', pct: 0 })
   const [discountCodes, setDiscountCodes] = useState([])
+  const [subCategories, setSubCategories] = useState([])
 
   // helper to extract validator / server errors nicely
   const extractError = async (res, fallback = 'Request failed') => {
@@ -373,6 +374,11 @@ const AppState = (props) => {
     const data = await res.json()
     return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
   }
+  const fetchProductsBySubCategorySlug = async (subSlug) => {
+    const res = await fetch(`${API_BASE}/api/products/bysubcategoryslug/${encodeURIComponent(subSlug || '')}`)
+    const data = await res.json()
+    return (data || []).map((p) => ({ ...p, localePrice: priceConverter(Number(p?.price || 0)) }))
+  }
   const createProductBE = async (payload) => {
     const res = await fetch(`${API_BASE}/api/products/createproduct`, {
       method: 'POST',
@@ -451,6 +457,60 @@ const AppState = (props) => {
     setCategories(data)
     toast.info('Category deleted')
     return data
+  }
+
+  // Sub-Categories
+  const fetchSubCategories = async () => {
+    const res = await fetch(`${API_BASE}/api/sub-categories`)
+    const data = await res.json()
+    setSubCategories(Array.isArray(data) ? data : [])
+    return data
+  }
+  const fetchSubCategoriesByCategoryId = async (categoryId) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories/by-category/${categoryId}`)
+    const data = await res.json()
+    return Array.isArray(data) ? data : []
+  }
+  const fetchSubCategoryById = async (id) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories/${id}`)
+    if (!res.ok) return null
+    return await res.json()
+  }
+  const createSubCategory = async (payload) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error('Create subcategory failed')
+    const data = await res.json()
+    toast.success('Subcategory created')
+    return data
+  }
+  const editSubCategory = async (id, payload) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'auth-token': adminToken },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) throw new Error('Edit subcategory failed')
+    const data = await res.json()
+    toast.success('Subcategory updated')
+    return data
+  }
+  const deleteSubCategory = async (id) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories/${id}`, {
+      method: 'DELETE',
+      headers: { 'auth-token': adminToken },
+    })
+    if (!res.ok) throw new Error('Delete subcategory failed')
+    toast.info('Subcategory deleted')
+    return true
+  }
+  const fetchSubCategoryBySlugs = async (categorySlug, subSlug) => {
+    const res = await fetch(`${API_BASE}/api/sub-categories/slug/${encodeURIComponent(categorySlug || '')}/${encodeURIComponent(subSlug || '')}`)
+    if (!res.ok) return null
+    return await res.json()
   }
 
   // Basic Info
@@ -722,7 +782,7 @@ const AppState = (props) => {
   }
 
     return (
-    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, discountCodes, fetchDiscountCodes, fetchDiscountCodeById, lookupDiscountCode, createDiscountCode, editDiscountCode, deleteDiscountCode, appliedDiscount, applyDiscount, clearDiscount, globalLoader, setGlobalLoader }}>
+    <AppContext.Provider value={{ products, setProducts, cart, addProduct, addProductWithPrescription, updateProduct, removeProduct, openCart, clearCart, adminToken, adminLoading, adminLogin, adminLogout, userToken, user, userRegister, userLogin, userLogout, getUser, updateUser, addToWishlist, removeFromWishlist, getUserOrders, fetchAllProductsBE, fetchSingleProductBE, fetchProductsByCategoryId, fetchProductsByCategorySlug, fetchProductsBySubCategorySlug, fetchHomePreviewProducts, createProductBE, editProductBE, deleteProductBE, categories, fetchCategories, createCategory, fetchCategoryById, fetchCategoryBySlug, editCategory, deleteCategory, subCategories, fetchSubCategories, fetchSubCategoriesByCategoryId, fetchSubCategoryById, fetchSubCategoryBySlugs, createSubCategory, editSubCategory, deleteSubCategory, basicInfo, setBasicInfo, getBasicInfo, editBasicInfo, uploadImage, createStripeSession, lenses, fetchLenses, fetchLensById, createLens, editLens, deleteLens, createOrder, sendOrderEmail, fetchOrders, updateOrderStatus, fetchOrderByTracking, posts, fetchPosts, fetchPostBySlug, fetchPostById, createPost, editPost, deletePost, discountCodes, fetchDiscountCodes, fetchDiscountCodeById, lookupDiscountCode, createDiscountCode, editDiscountCode, deleteDiscountCode, appliedDiscount, applyDiscount, clearDiscount, globalLoader, setGlobalLoader }}>
             {props.children}
         </AppContext.Provider>
     )

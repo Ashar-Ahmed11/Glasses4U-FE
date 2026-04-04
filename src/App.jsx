@@ -25,6 +25,7 @@ import PupilDistance from './pages/PupilDistance';
 import ShippingPolicy from './pages/ShippingPolicy';
 import Blogs from './components/blogs';
 import BlogDetail from './components/blogDetail';
+import SubCategory from './pages/SubCategory';
 const Success = () => {
   const tracking = localStorage.getItem('lastTrackingId') || ''
   return (
@@ -48,6 +49,7 @@ function App() {
 
       <Switch>
         <Route path="/" exact><Home /></Route>
+        <Route path="/category/:slug/:subslug" exact><SubCategory /></Route>
         <Route path="/category/:slug" exact><Category /></Route>
         <Route path="/product/:productid" exact ><ProductView /></Route>
         <Route path="/checkout" exact><Checkout /></Route>

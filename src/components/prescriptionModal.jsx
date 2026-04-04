@@ -665,9 +665,9 @@ const PrescriptionModal = ({ onComplete }) => {
                 <h3 className="mb-1">Step 3 - Lens Type</h3>
                 <div className="row g-3 mt-2">
                   {[
-                    { key: 'clear', title: 'CLEAR LENSES', desc: 'These lenses stays clear indoor and outdoor.' },
-                    { key: 'photochromic', title: 'PHOTOCHROMIC - DARK IN SUN', desc: 'They will turn dark in sunlight and stays clear indoor.' },
-                    { key: 'sunglasses', title: 'SUNGLASSES (ALWAYS DARK)', desc: 'Sunglasses in your prescription.' },
+                    { key: 'clear', title: 'CLEAR LENSES', desc: 'These lenses stays clear indoor and outdoor.', img: basicInfo?.clearLensesImage },
+                    { key: 'photochromic', title: 'PHOTOCHROMIC - DARK IN SUN', desc: 'They will turn dark in sunlight and stays clear indoor.', img: basicInfo?.photochromicLensesImage },
+                    { key: 'sunglasses', title: 'SUNGLASSES (ALWAYS DARK)', desc: 'Sunglasses in your prescription.', img: basicInfo?.sunglassesImage },
                   ].map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
                       <button
@@ -686,8 +686,12 @@ const PrescriptionModal = ({ onComplete }) => {
                         <div className="text-center fw-bold mb-3">{item.title}</div>
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
-                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 96, height: 96 }}>
-                            <span className="fs-3">🕶️</span>
+                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 96, height: 96 }}>
+                            {item.img ? (
+                              <img src={item.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <span className="fs-3">🕶️</span>
+                            )}
                           </div>
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
@@ -778,9 +782,8 @@ const PrescriptionModal = ({ onComplete }) => {
                     const titleUpper = String(item.title || '').toUpperCase()
                     const basePrice = Number(item.price || 0)
                     const sale = Number(item.salePrice || 0)
-                    const displayPrice = sale > 0 ? sale : basePrice
-                    const priceLabel = `$${Number(displayPrice).toFixed(2)}`
-                    const heading = `${[thicknessLabel, titleUpper].filter(Boolean).join(' ')}+ ${priceLabel}`
+                    const isZeroThickness = Number(item?.thickness || 0) === 0
+                    const heading = (isZeroThickness ? [titleUpper] : [thicknessLabel, titleUpper]).filter(Boolean).join(' ')
                     return (
                       <div key={item._id} className="col-12 col-md-6">
                         <button
@@ -824,12 +827,16 @@ const PrescriptionModal = ({ onComplete }) => {
                     const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
                     const premiumPrice = Number(basicInfo?.premiumCoatingPrice || 0)
                     const bluecutPrice = Number(basicInfo?.bluecutCoatingPrice || 0)
+                    const standardSale = Number(basicInfo?.standardCoatingSalePrice || 0)
+                    const premiumSale = Number(basicInfo?.premiumCoatingSalePrice || 0)
+                    const bluecutSale = Number(basicInfo?.bluecutCoatingSalePrice || 0)
+                    const noneImg = basicInfo?.noCoatingsImage || ''
                     const items = [
-                      { key: 'standard', title: `STANDARD COATINGS+ $${standardPrice.toFixed(2)}`, desc: 'Anti-Reflective, UV and Scratch Resistance', price: standardPrice },
-                      { key: 'premium', title: `PREMIUM COATINGS+ $${premiumPrice.toFixed(2)}`, desc: 'Anti-Reflective, Hydrophobic, UV and Scratch Resistance', price: premiumPrice },
-                      { key: 'bluecut', title: `BLUE CUT DIGITAL PROTECTION+ $${bluecutPrice.toFixed(2)}`, desc: 'Digital Screen Protection and All Premium Coatings', price: bluecutPrice },
-                      { key: 'none', title: 'NO COATINGS+ $0.00', desc: 'There will be no protective layer to filter harmful rays.', price: 0 },
-                    ]
+                      { key: 'standard', title: 'Standard Coatings', base: standardPrice, sale: standardSale, desc: 'Anti-Reflective, UV and Scratch Resistance', img: basicInfo?.standardCoatingImage || '' },
+                      { key: 'premium', title: 'Premium Coatings', base: premiumPrice, sale: premiumSale, desc: 'Anti-Reflective, Hydrophobic, UV and Scratch Resistance', img: basicInfo?.premiumCoatingImage || '' },
+                      { key: 'bluecut', title: 'Blue Cut Digital Protection', base: bluecutPrice, sale: bluecutSale, desc: 'Digital Screen Protection and All Premium Coatings', img: basicInfo?.bluecutCoatingImage || '' },
+                      { key: 'none', title: 'No Coatings', base: 0, sale: 0, desc: 'There will be no protective layer to filter harmful rays.', img: noneImg },
+                    ].map(it => ({ ...it, price: it.sale > 0 ? it.sale : it.base }))
                     return items
                   })().map((item) => (
                     <div key={item.key} className="col-12 col-md-6">
@@ -838,11 +845,25 @@ const PrescriptionModal = ({ onComplete }) => {
                         onClick={() => setCoating(item.key)}
                         className={`w-100 text-start bg-white border rounded-3 p-4 h-100 ${coating === item.key ? 'border-primary shadow' : ''}`}
                       >
-                        <div className="fw-bold mb-3">{item.title}</div>
+                        <div className="fw-bold mb-2 text-center">
+                          {item.title}
+                          {item.sale > 0 ? (
+                            <>
+                              <span className="text-muted ms-2" style={{ textDecoration: 'line-through' }}>${item.base.toFixed(2)}</span>
+                              <span className="text-danger ms-2">${item.price.toFixed(2)}</span>
+                            </>
+                          ) : (
+                            <span className="ms-2">${item.price.toFixed(2)}</span>
+                          )}
+                        </div>
                         <hr className="my-3" />
                         <div className="d-flex align-items-center gap-3">
-                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center" style={{ width: 80, height: 80 }}>
-                            <span className="fs-3">{item.key === 'standard' ? '✨' : '⭕'}</span>
+                          <div className="rounded-circle bg-light border d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 80, height: 80 }}>
+                            {item.img ? (
+                              <img src={item.img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <span className="fs-3">{item.key === 'standard' ? '✨' : '⭕'}</span>
+                            )}
                           </div>
                           <p className="mb-0 text-muted">{item.desc}</p>
                         </div>
@@ -863,10 +884,13 @@ const PrescriptionModal = ({ onComplete }) => {
                       const standardPrice = Number(basicInfo?.standardCoatingPrice || 0)
                       const premiumPrice = Number(basicInfo?.premiumCoatingPrice || 0)
                       const bluecutPrice = Number(basicInfo?.bluecutCoatingPrice || 0)
+                      const standardSale = Number(basicInfo?.standardCoatingSalePrice || 0)
+                      const premiumSale = Number(basicInfo?.premiumCoatingSalePrice || 0)
+                      const bluecutSale = Number(basicInfo?.bluecutCoatingSalePrice || 0)
                       const coatingMap = {
-                        standard: { key: 'standard', title: 'Standard Coatings', price: standardPrice },
-                        premium: { key: 'premium', title: 'Premium Coatings', price: premiumPrice },
-                        bluecut: { key: 'bluecut', title: 'Blue Cut Digital Protection', price: bluecutPrice },
+                        standard: { key: 'standard', title: 'Standard Coatings', price: (standardSale > 0 ? standardSale : standardPrice) },
+                        premium: { key: 'premium', title: 'Premium Coatings', price: (premiumSale > 0 ? premiumSale : premiumPrice) },
+                        bluecut: { key: 'bluecut', title: 'Blue Cut Digital Protection', price: (bluecutSale > 0 ? bluecutSale : bluecutPrice) },
                         none: { key: 'none', title: 'No Coatings', price: 0 },
                       }
                       const payload = {

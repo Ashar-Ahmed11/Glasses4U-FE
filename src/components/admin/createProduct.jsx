@@ -20,7 +20,7 @@ export default function CreateProduct() {
     const history = useHistory()
     const [variants, setVariants] = useState([]);
 
-    const { fetchAllProductsBE, fetchSingleProductBE, createProductBE, editProductBE, deleteProductBE, fetchCategories, categories } = useContext(AppContext)
+    const { fetchAllProductsBE, fetchSingleProductBE, createProductBE, editProductBE, deleteProductBE, fetchCategories, categories, fetchSubCategoriesByCategoryId } = useContext(AppContext)
     const [imgPreview, setImgPreview] = useState([])
     const modalRef = useRef(null)
 
@@ -38,6 +38,7 @@ export default function CreateProduct() {
         salePrice: "",
         description: "",
         category: "",
+        subcategories: [],
         homePreview: false,
         youtubeLink: '',
         frameSpecs: {
@@ -60,6 +61,7 @@ export default function CreateProduct() {
             salePrice: Number(components.salePrice || 0),
             description: components.description,
             category: components.category,
+            subcategories: Array.isArray(components.subcategories) ? components.subcategories.filter(Boolean) : [],
             homePreview: components.homePreview,
             youtubeLink: components.youtubeLink,
             priceAED: Number(components.priceAED || 0),
@@ -112,7 +114,7 @@ export default function CreateProduct() {
         if (prodid) (async () => {
             const data = await fetchSingleProductBE(prodid)
             if (data) {
-                const { name, price, salePrice, description, youtubeLink, homePreview, category, priceAED, _id, variants: vs, assets, frameSpecs } = data
+                const { name, price, salePrice, description, youtubeLink, homePreview, category, subcategories, priceAED, _id, variants: vs, assets, frameSpecs } = data
                 setComponents({
                     namer: name,
                     price: price,
@@ -121,6 +123,7 @@ export default function CreateProduct() {
                     youtubeLink: youtubeLink,
                     homePreview: homePreview,
                     category: category,
+                    subcategories: Array.isArray(subcategories) ? subcategories : [],
                     priceAED: priceAED,
                     _id: _id,
                     frameSpecs: {
@@ -230,7 +233,7 @@ export default function CreateProduct() {
                                 </div>
                             </div>}
 
-                            <select value={components.category || ''} onChange={(e) => setComponents({ ...components, category: e.target.value })} class="form-select my-3" aria-label="Default select example">
+                            <select value={components.category || ''} onChange={(e) => setComponents({ ...components, category: e.target.value, subcategories: [] })} class="form-select my-3" aria-label="Default select example">
                                 <option value="">Select Category</option>
                                 {categories?.map((e, i) => (
                                     <option key={i} value={e.mainHeading?.replace(' ', '').toLowerCase()}>
@@ -238,6 +241,15 @@ export default function CreateProduct() {
                                     </option>
                                 ))}
                             </select>
+
+                            {/* Subcategories (dynamic rows) */}
+                            <SubcategorySelector
+                              categories={categories}
+                              parentSlug={components.category}
+                              selections={components.subcategories}
+                              onChange={(vals) => setComponents({ ...components, subcategories: vals })}
+                              fetchByCategoryId={fetchSubCategoriesByCategoryId}
+                            />
 
                             <div className="my-3 p-3 border rounded">
                                 <h5 className="mb-3">Frame Specs</h5>
@@ -360,3 +372,54 @@ export default function CreateProduct() {
     )
 }
 
+// Helper subcategory selector (dynamic rows)
+function SubcategorySelector({ categories, parentSlug, selections, onChange, fetchByCategoryId }) {
+  const [options, setOptions] = React.useState([])
+  const toHyphen = (s) => (s || '').toString().toLowerCase().replace(/[\s\-_\/]+/g, '-').replace(/[^a-z0-9-]/g, '')
+  const toCompact = (s) => (s || '').toString().toLowerCase().replace(/[\s\-_\/]+/g, '').replace(/[^a-z0-9]/g, '')
+
+  React.useEffect(() => {
+    (async () => {
+      setOptions([])
+      const slug = String(parentSlug || '')
+      if (!slug) return
+      const cat = (categories || []).find(c => toHyphen(c.mainHeading) === toHyphen(slug) || toCompact(c.mainHeading) === toCompact(slug))
+      if (!cat?._id) return
+      const subs = await fetchByCategoryId(cat._id)
+      setOptions(Array.isArray(subs) ? subs : [])
+    })()
+  }, [parentSlug, categories, fetchByCategoryId])
+
+  const addRow = () => onChange([...(selections || []), ''])
+  const updateAt = (idx, val) => {
+    const next = [...(selections || [])]
+    next[idx] = val
+    onChange(next)
+  }
+  const removeAt = (idx) => {
+    const next = (selections || []).filter((_, i) => i !== idx)
+    onChange(next)
+  }
+
+  return (
+    <div className="my-2">
+      <div className="d-flex align-items-center justify-content-between">
+        <h6 className="mb-0">Subcategories</h6>
+        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={addRow} disabled={!parentSlug}>Add Subcategory</button>
+      </div>
+      {(selections || []).map((val, idx) => (
+        <div key={idx} className="d-flex align-items-center gap-2 my-2">
+          <select className="form-select" value={val} onChange={(e) => updateAt(idx, e.target.value)}>
+            <option value="">Select Sub Category</option>
+            {options.map((s) => (
+              <option key={s._id} value={s.mainHeading}>{s.mainHeading}</option>
+            ))}
+          </select>
+          <button type="button" className="btn btn-outline-danger" onClick={() => removeAt(idx)} aria-label="Remove subcategory">
+            <i className="fa fa-times" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}

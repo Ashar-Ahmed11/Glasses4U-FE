@@ -25,6 +25,8 @@ import AdminBlogs from "./adminBlogs";
 import CreatePost from "./createPost";
 import DiscountCodes from "./discountCodes";
 import CreateDiscountCode from "./createDiscountCode";
+import CreateSubCategory from "./createSubCategory";
+import ViewSubCategories from "./viewSubCategories";
 
 // import { useEffect } from "react";
 const Dashboard = () => {
@@ -181,8 +183,17 @@ const Dashboard = () => {
                             <Route path="/dashboard/edit-category/:catid">
                                 <CreateCategory />
                             </Route>
+                            <Route exact path="/dashboard/create-subcategory">
+                                <CreateSubCategory />
+                            </Route>
+                            <Route path="/dashboard/edit-subcategory/:subcatid">
+                                <CreateSubCategory />
+                            </Route>
                             <Route exact path="/dashboard/categories">
                                 <ViewCategories />
+                            </Route>
+                            <Route exact path="/dashboard/subcategories">
+                                <ViewSubCategories />
                             </Route>
                             <Route exact path="/dashboard/eyewear">
                                 <Eyewear />

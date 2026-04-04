@@ -7,17 +7,17 @@ import ProductCard from '../components/ui/productCard';
 import CategoryCarousel from '../components/ui/CategoryCarousel';
 import MetaDecorator from '../components/metaDecorator';
 
-const Category = () => {
+const SubCategory = () => {
   const { slug, subslug } = useParams()
   const location = useLocation()
   const history = useHistory()
-  const { fetchCategoryBySlug, fetchProductsByCategorySlug, fetchProductsBySubCategorySlug, setGlobalLoader } = useContext(AppContext)
-  const [category, setCategory] = useState(null)
+  const { fetchSubCategoryBySlugs, fetchProductsBySubCategorySlug, setGlobalLoader } = useContext(AppContext)
+  const [subCategory, setSubCategory] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [catProducts, setCatProducts] = useState([])
-  const [selected, setSelected] = useState({}) // { key: Set<string> }
-  const [openGroups, setOpenGroups] = useState({}) // { key: boolean }
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' }) // strings for inputs
+  const [products, setProducts] = useState([])
+  const [selected, setSelected] = useState({})
+  const [openGroups, setOpenGroups] = useState({})
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' })
 
   const FILTER_FIELDS = useMemo(() => ([
     { key: 'lensWidth', label: 'Lens Width' },
@@ -35,11 +35,11 @@ const Category = () => {
     ;(async () => {
       try {
         setGlobalLoader(true)
-        const cat = await fetchCategoryBySlug(slug)
-        const prods = subslug ? await fetchProductsBySubCategorySlug(subslug) : await fetchProductsByCategorySlug(slug)
+        const doc = await fetchSubCategoryBySlugs(slug, subslug)
+        const prods = await fetchProductsBySubCategorySlug(subslug)
         if (!mounted) return
-        setCategory(cat)
-        setCatProducts(prods || [])
+        setSubCategory(doc)
+        setProducts(prods || [])
       } finally {
         if (mounted) setLoading(false)
         setGlobalLoader(false)
@@ -48,7 +48,6 @@ const Category = () => {
     return () => { mounted = false }
   }, [slug, subslug]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Initialize filters from query params (e.g., ?shape=Round&color=Black)
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const next = {}
@@ -57,7 +56,6 @@ const Category = () => {
       if (!val) return
       const values = val.split(',').map(v => String(v))
       next[key] = new Set(values)
-      // auto-open groups with preselected filters
       setOpenGroups(prev => ({ ...prev, [key]: true }))
     })
     if (Object.keys(next).length) setSelected(next)
@@ -76,7 +74,6 @@ const Category = () => {
       const arr = Array.from(set || [])
       if (arr.length) params.set(k, arr.join(','))
     })
-    // include price range if set
     const minNum = Number(pr.min)
     const maxNum = Number(pr.max)
     if (!Number.isNaN(minNum) && String(pr.min).trim() !== '') params.set('priceMin', String(minNum))
@@ -85,11 +82,10 @@ const Category = () => {
     history.replace({ pathname: location.pathname, search: search ? `?${search}` : '' })
   }
 
-  // Build facet counts from products in this category
   const facets = useMemo(() => {
     const bucketByKey = {}
     FILTER_FIELDS.forEach(f => { bucketByKey[f.key] = new Map() })
-    for (const p of catProducts) {
+    for (const p of products) {
       const specs = p?.frameSpecs || {}
       for (const { key } of FILTER_FIELDS) {
         const raw = specs?.[key]
@@ -113,9 +109,8 @@ const Category = () => {
       result[key] = sorted
     }
     return result
-  }, [catProducts, FILTER_FIELDS])
+  }, [products, FILTER_FIELDS])
 
-  // Toggle selection for a given filter value
   const toggleOption = (key, value) => {
     setSelected(prev => {
       const current = new Set(prev[key] || [])
@@ -139,7 +134,6 @@ const Category = () => {
     syncUrl({})
   }
 
-  // Filter products using AND across groups and OR within a group
   const filteredProducts = useMemo(() => {
     const activeKeys = Object.keys(selected)
     const minNum = Number(priceRange.min)
@@ -168,14 +162,13 @@ const Category = () => {
         return true
       })
     }
-    return byPrice(bySpecs(catProducts))
-  }, [catProducts, selected, priceRange])
+    return byPrice(bySpecs(products))
+  }, [products, selected, priceRange])
 
   const toggleGroup = (key) => setOpenGroups(prev => ({ ...prev, [key]: !prev[key] }))
   const onPriceChange = (field, value) => {
     const next = { ...priceRange, [field]: value }
     setPriceRange(next)
-    // sync with current selected filters
     const cleaned = Object.fromEntries(Object.entries(selected).filter(([, s]) => s && s.size))
     syncUrl(cleaned, next)
   }
@@ -185,34 +178,27 @@ const Category = () => {
     syncUrl(cleaned, { min: '', max: '' })
   }
 
-  // SEO meta
   const metaTitle = useMemo(() => {
-    if (subslug) return `${(category?.mainHeading || '').toString()} — ${subslug.replace(/-/g, ' ')}`.trim() || 'Category'
-    return category?.metaTitle || category?.mainHeading || 'Category'
-  }, [category, subslug])
+    return subCategory?.metaTitle || subCategory?.mainHeading || 'Subcategory'
+  }, [subCategory])
   const metaDescription = useMemo(() => {
-    if (category?.metaDescription) return category.metaDescription
-    const stripped = String(category?.categoryDescription || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+    if (subCategory?.metaDescription) return subCategory.metaDescription
+    const stripped = String(subCategory?.categoryDescription || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
     if (stripped) return stripped.slice(0, 160)
-    return category?.mainHeading ? `Shop ${category.mainHeading} at Glasses4U.` : 'Browse our curated eyewear collections.'
-  }, [category])
+    return subCategory?.mainHeading ? `Shop ${subCategory.mainHeading} at Glasses4U.` : 'Browse our curated eyewear collections.'
+  }, [subCategory])
 
   return (
     <>
       <Header />
       <MetaDecorator title={metaTitle} description={metaDescription} />
       <main>
-        {/* Hero / Carousel */}
-        <section className="top-bg">{category?.coverImage ? <CategoryCarousel imageUrl={category.coverImage} heading={category?.mainHeading} /> : null}</section>
-
-        {/* Filters + Products */}
+        <section className="top-bg">{subCategory?.coverImage ? <CategoryCarousel imageUrl={subCategory.coverImage} heading={subCategory?.mainHeading} /> : null}</section>
         <section className="container my-4">
           <div className="row">
-            {/* Sidebar Filters */}
             <aside className="col-12 col-lg-3 mb-4 mb-lg-0">
               <div className="card shadow-sm border-0">
                 <div className="card-body">
-                  {/* Price range */}
                   <div className="mb-4">
                     <div className="d-flex align-items-center justify-content-between mb-2">
                       <h5 className="mb-0 fw-bold">Price</h5>
@@ -325,8 +311,6 @@ const Category = () => {
                 </div>
               </div>
             </aside>
-
-            {/* Products grid */}
             <div className="col-12 col-lg-9">
               <div className="row justify-content-center">
                 {filteredProducts.map((p) => (
@@ -335,18 +319,16 @@ const Category = () => {
                   </div>
                 ))}
                 {!filteredProducts.length && (
-                  <div className="col-12 text-center py-5 text-muted">No products found in this category.</div>
+                  <div className="col-12 text-center py-5 text-muted">No products found in this subcategory.</div>
                 )}
               </div>
             </div>
           </div>
         </section>
-
-        {/* Jodit Description */}
-        {category?.categoryDescription ? (
+        {subCategory?.categoryDescription ? (
           <section className="container my-5">
             <div className="card border-0 p-3">
-              <div dangerouslySetInnerHTML={{ __html: category.categoryDescription }} />
+              <div dangerouslySetInnerHTML={{ __html: subCategory.categoryDescription }} />
             </div>
           </section>
         ) : null}
@@ -356,4 +338,5 @@ const Category = () => {
   )
 }
 
-export default Category;
+export default SubCategory;
+

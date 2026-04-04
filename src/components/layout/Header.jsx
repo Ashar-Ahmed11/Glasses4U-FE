@@ -6,7 +6,7 @@ import ProductCard from '../ui/productCard';
 import { createPortal } from 'react-dom';
 
 const Header = () => {
-  const { categories, fetchCategories, userToken, basicInfo, getBasicInfo, products, fetchAllProductsBE, fetchProductsByCategorySlug } = useContext(AppContext)
+  const { categories, fetchCategories, userToken, basicInfo, getBasicInfo, products, fetchAllProductsBE, fetchProductsByCategorySlug, fetchSubCategoriesByCategoryId } = useContext(AppContext)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   useEffect(() => { fetchCategories(); getBasicInfo() }, [])
@@ -46,15 +46,14 @@ const Header = () => {
   // Mega menu state
   const [megaOpen, setMegaOpen] = useState(false)
   const [megaSlug, setMegaSlug] = useState('')
-  const [megaFacets, setMegaFacets] = useState(null) // {shape:[{v,c}], ...}
+  const [megaSubs, setMegaSubs] = useState([]) // subcategories list
   const [megaLoading, setMegaLoading] = useState(false)
-  const facetFields = useMemo(() => ['shape', 'color', 'material', 'size', 'gender'], [])
   const toSlug = (s) => (s || '').toString().toLowerCase().replace(/[\s\-_\/]+/g, '-').replace(/[^a-z0-9-]/g, '')
   // Mobile offcanvas mega
   const [mMegaOpen, setMMegaOpen] = useState(false)
   const [mMegaSlug, setMMegaSlug] = useState('')
   const [mMegaTitle, setMMegaTitle] = useState('')
-  const [mMegaFacets, setMMegaFacets] = useState(null)
+  const [mMegaSubs, setMMegaSubs] = useState([])
   const [mMegaLoading, setMMegaLoading] = useState(false)
   const openMegaFor = async (cat) => {
     const slug = toSlug(cat.mainHeading)
@@ -62,57 +61,16 @@ const Header = () => {
     setMegaOpen(true)
     try {
       setMegaLoading(true)
-      const prods = await fetchProductsByCategorySlug(slug)
-      const buckets = {}
-      facetFields.forEach(k => buckets[k] = new Map())
-      for (const p of prods) {
-        const fs = p?.frameSpecs || {}
-        for (const k of facetFields) {
-          const val = fs?.[k]
-          if (!val) continue
-          const key = String(val)
-          const m = buckets[k]
-          m.set(key, (m.get(key) || 0) + 1)
-        }
-      }
-      const result = {}
-      for (const k of facetFields) {
-        result[k] = Array.from(buckets[k].entries())
-          .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
-          .map(([value, count]) => ({ value, count }))
-      }
-      setMegaFacets(result)
+      const subs = await fetchSubCategoriesByCategoryId(cat._id)
+      setMegaSubs(Array.isArray(subs) ? subs : [])
     } catch (_) {
-      setMegaFacets(null)
+      setMegaSubs([])
     } finally {
       setMegaLoading(false)
     }
   }
-  const closeMega = () => { setMegaOpen(false); setMegaSlug(''); setMegaFacets(null) }
-  const onFacetClick = () => { closeMega() }
-  // Build facets for a slug (helper for mobile)
-  const buildFacetsForSlug = async (slug) => {
-    const prods = await fetchProductsByCategorySlug(slug)
-    const buckets = {}
-    facetFields.forEach(k => buckets[k] = new Map())
-    for (const p of prods) {
-      const fs = p?.frameSpecs || {}
-      for (const k of facetFields) {
-        const val = fs?.[k]
-        if (!val) continue
-        const key = String(val)
-        const m = buckets[k]
-        m.set(key, (m.get(key) || 0) + 1)
-      }
-    }
-    const result = {}
-    for (const k of facetFields) {
-      result[k] = Array.from(buckets[k].entries())
-        .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
-        .map(([value, count]) => ({ value, count }))
-    }
-    return result
-  }
+  const closeMega = () => { setMegaOpen(false); setMegaSlug(''); setMegaSubs([]) }
+  const onSubClick = () => { closeMega() }
   const openMobileMega = async (cat) => {
     const slug = toSlug(cat.mainHeading)
     setMMegaTitle(cat.mainHeading || '')
@@ -120,18 +78,18 @@ const Header = () => {
     setMMegaOpen(true)
     try {
       setMMegaLoading(true)
-      const result = await buildFacetsForSlug(slug)
-      setMMegaFacets(result)
+      const subs = await fetchSubCategoriesByCategoryId(cat._id)
+      setMMegaSubs(Array.isArray(subs) ? subs : [])
     } catch {
-      setMMegaFacets(null)
+      setMMegaSubs([])
     } finally {
       setMMegaLoading(false)
     }
   }
   const closeMobileMega = () => {
-    setMMegaOpen(false); setMMegaSlug(''); setMMegaTitle(''); setMMegaFacets(null)
+    setMMegaOpen(false); setMMegaSlug(''); setMMegaTitle(''); setMMegaSubs([])
   }
-  const onMobileFacetClick = () => { closeMobileMega(); closeMobileOffcanvas() }
+  const onMobileSubClick = () => { closeMobileMega(); closeMobileOffcanvas() }
 
   return (
     <header className="sticky-top  shadow-sm top-bg">
@@ -223,40 +181,27 @@ const Header = () => {
               </div>
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h5 className="mb-0">{mMegaTitle}</h5>
-                <Link className="btn btn-sm btn-outline-secondary" to={`/category/${mMegaSlug}`} onClick={onMobileFacetClick}>
+                <Link className="btn btn-sm btn-outline-secondary" to={`/category/${mMegaSlug}`} onClick={onMobileSubClick}>
                   Shop all
                 </Link>
               </div>
               {mMegaLoading ? (
                 <div className="d-flex justify-content-center py-3">
-                  <div className="spinner-border" role="status" aria-label="Loading facets" />
+                  <div className="spinner-border" role="status" aria-label="Loading" />
                 </div>
               ) : (
-              <div className="row">
-                {facetFields.map((field) => {
-                  const items = mMegaFacets?.[field] || []
-                  if (!items.length) return null
+              <ul className="list-unstyled mb-0">
+                {(mMegaSubs || []).map((s) => {
+                  const subSlug = toSlug(s.mainHeading)
                   return (
-                    <div key={`m-${field}`} className="col-12 mb-3">
-                      <div className="fw-bold text-uppercase small mb-2">{field}</div>
-                      <ul className="list-unstyled mb-0">
-                        {items.slice(0, 8).map(({ value, count }) => (
-                          <li key={`${field}-${value}`} className="d-flex align-items-center justify-content-between">
-                            <Link
-                              className="text-decoration-none py-1 text-dark flex-grow-1"
-                              to={`/category/${mMegaSlug}?${field}=${encodeURIComponent(value)}`}
-                              onClick={onMobileFacetClick}
-                            >
-                              {value}
-                            </Link>
-                            <small className="text-muted ms-2">({count})</small>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <li key={s._id} className="d-flex align-items-center justify-content-between">
+                      <Link className="text-decoration-none py-1 text-dark flex-grow-1" to={`/category/${mMegaSlug}/${subSlug}`} onClick={onMobileSubClick}>
+                        {s.mainHeading}
+                      </Link>
+                    </li>
                   )
                 })}
-              </div>
+              </ul>
               )}
             </div>
           )}
@@ -364,30 +309,18 @@ const Header = () => {
           <div className="container py-3">
             {megaLoading ? (
               <div className="d-flex justify-content-center py-4">
-                <div className="spinner-border" role="status" aria-label="Loading facets" />
+                <div className="spinner-border" role="status" aria-label="Loading" />
               </div>
             ) : (
             <div className="row">
-              {facetFields.map((field) => {
-                const items = megaFacets?.[field] || []
-                if (!items.length) return null
+              {(megaSubs || []).map((s) => {
+                const subSlug = toSlug(s.mainHeading)
                 return (
-                  <div key={field} className="col-6 col-md-4 col-lg-2 mb-3">
-                    <div className="fw-bold text-uppercase small mb-2">{field}</div>
-                    <ul className="list-unstyled mb-0">
-                      {items.slice(0, 8).map(({ value, count }) => (
-                        <li key={`${field}-${value}`}>
-                          <Link
-                            className="text-decoration-none d-flex justify-content-between align-items-center py-1 text-dark"
-                            to={`/category/${megaSlug}?${field}=${encodeURIComponent(value)}`}
-                            onClick={onFacetClick}
-                          >
-                            <span>{value}</span>
-                            <small className="text-muted">({count})</small>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                  <div key={s._id} className="col-6 col-md-4 col-lg-3 mb-2">
+                    <Link className="text-decoration-none d-flex justify-content-between align-items-center py-1 text-dark" to={`/category/${megaSlug}/${subSlug}`} onClick={onSubClick}>
+                      <span>{s.mainHeading}</span>
+                      <i className="fa fa-angle-right text-muted" />
+                    </Link>
                   </div>
                 )
               })}
